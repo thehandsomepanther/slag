@@ -17,7 +17,8 @@ let grid = new contrib.grid({
 let channelTree = {}
 let channelList = {}
 let userList = {}
-let currentChannel = 'general'
+let currentChannel = ''
+let lastMessager = ''
 
 let border = {type: "line", fg: "cyan"}
 let focusBorder = {type: "line", fg: "green"}
@@ -44,12 +45,14 @@ function getChannels() {
   slack.channels.list({token}, (err, data) => {
     for (var channel in data.channels) {
       channel = data.channels[channel]
-      if (channel.is_member) {
-        channelTree.children['Your Channels'].children[channel.name] = {}
-      } else {
-        channelTree.children['Other Channels'].children[channel.name] = {}
-      }
+      channelTree
+        .children[channel.is_member ? 'Your Channels' : 'Other Channels']
+        .children[channel.name] = {'id': channel.id}
       channelList[channel.id] = channel.name
+
+      if (channel.is_general) {
+        currentChannel = channel.id
+      }
     }
 
     getUsers()
@@ -79,28 +82,40 @@ function prepareScreen() {
   var log = grid.set(0, 4, 11, 8, contrib.log, {
     border: border,
     fg: "green",
-    label: `#${currentChannel}`,
+    label: `#${channelList[currentChannel]}`,
     tags: true,
     scrollable: true
   })
 
   bot.message((message) => {
-    if (channelList[message.channel] == currentChannel) {
-      log.log(userList[message.user])
+    if (message.channel == currentChannel) {
+      if (message.user != lastMessager) {
+        log.log(userList[message.user])
+        lastMessager = message.user
+      }
       log.log(`{white-fg}${message.text}{/white-fg}`)
     }
   })
 
   var input = grid.set(11, 4, 1.5, 8, blessed.textbox, {
     keys: true,
-    label: `Message #${currentChannel}`,
+    label: `Message #${channelList[currentChannel]}`,
     border: border
   })
 
   input.on('submit', (data) => {
     var message = input.getValue()
     input.clearValue()
-    log.log('{white-fg}' + message + '{/white-fg}')
+    slack.chat.postMessage({
+      token: token,
+      channel: currentChannel,
+      text: message,
+      as_user: true
+    }, (err, data) => {
+      if (err) {
+        console.log(err)
+      }
+    })
   })
 
   let tree = grid.set(0, 0, 12, 4, contrib.tree, {
@@ -111,12 +126,15 @@ function prepareScreen() {
   })
 
   tree.on('select', (node) => {
-    if (node.children == undefined) {
-      currentChannel = node.name
-      input.setLabel(`Message #${currentChannel}`)
-      log.setLabel(`#${currentChannel}`)
-      screen.render()
+    if (node.children == undefined && node.id != currentChannel) {
+      currentChannel = node.id
+      input.setLabel(`Message #${channelList[currentChannel]}`)
+      log.setLabel(`#${channelList[currentChannel]}`)
+      log.clearItems()
+      lastMessager = ''
     }
+
+    screen.render()
   })
 
   tree.setData(channelTree)
@@ -138,6 +156,8 @@ function prepareScreen() {
   screen.key(['escape', 'C-c'], (ch, key) => {
     return process.exit(0);
   });
+
+  screen.render()
 }
 
 getChannels()
