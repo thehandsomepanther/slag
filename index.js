@@ -1,13 +1,17 @@
 let blessed = require('blessed')
 let contrib = require('blessed-contrib')
-let slack = require('slack')
 let env = require('node-env-file')
+let slack = require('slack')
+
+let getChannels = require('./getChannels')
+let getTeams = require('./getTeams')
+let getUsers = require('./getUsers')
+
 env(__dirname + '/.env')
 
 let bot = slack.rtm.client()
 let token = process.env.SLACK_TOKEN
-
-bot.listen({token})
+// bot.listen({token})
 
 let screen = blessed.screen()
 let grid = new contrib.grid({
@@ -16,83 +20,46 @@ let grid = new contrib.grid({
 
 let channelTree = {}
 let channelList = {}
-let userList = {}
 let currentChannel = ''
-let lastMessager = ''
-let team = ''
-
-let border = {type: "line", fg: "cyan"}
-let focusBorder = {type: "line", fg: "green"}
+let userList = {}
+let currentTeam = ''
 
 function* screenGenerator() {
-  yield
-  yield
+  var i = 0
+  while (i < 3) {
+    var data = yield
+    console.log(Object.keys(data))
+
+    switch(Object.keys(data)[0]) {
+      case 'getChannels':
+        [channelTree, channelList, currentChannel] = data['getChannels']
+        break
+      case 'getUsers':
+        userList = data['getUsers']
+        break
+      case 'getTeams':
+        currentTeam = data['getTeams']
+        console.log(currentTeam)
+        break
+      default:
+        break
+    }
+
+    i++
+  }
   prepareScreen()
 }
 
 let gen = screenGenerator()
 
-getChannels()
-getUsers()
-getTeam()
+let lastMessager = ''
 
-function getChannels() {
-  channelTree = {
-    extended: true,
-    children: {
-      'Your Channels': {
-        extended: true,
-        children: {
+getTeams(token, gen)
+getChannels(token, gen)
+getUsers(token, gen)
 
-        }
-      },
-      'Other Channels': {
-        extended: false,
-        children: {
-
-        }
-      }
-    }
-  }
-
-  slack.channels.list({token}, (err, data) => {
-    for (var channel in data.channels) {
-      channel = data.channels[channel]
-      channelTree
-        .children[channel.is_member ? 'Your Channels' : 'Other Channels']
-        .children[channel.name] = {'id': channel.id}
-      channelList[channel.id] = channel.name
-
-      if (channel.is_general) {
-        currentChannel = channel.id
-      }
-    }
-
-    gen.next()
-  })
-}
-
-function getUsers() {
-  slack.users.list({token}, (err, data) => {
-    for (var user in data.members) {
-      user = data.members[user]
-      if (user.real_name) {
-        userList[user.id] = user.real_name
-      } else {
-        userList[user.id] = user.name
-      }
-    }
-
-    gen.next()
-  })
-}
-
-function getTeam() {
-  slack.team.info({token}, (err, data) => {
-    team = data.team.name
-    gen.next()
-  })
-}
+let border = {type: "line", fg: "cyan"}
+let focusBorder = {type: "line", fg: "green"}
 
 function prepareScreen() {
   var log = grid.set(0, 4, 11, 8, contrib.log, {
@@ -136,7 +103,7 @@ function prepareScreen() {
 
   let tree = grid.set(0, 0, 12, 4, contrib.tree, {
     fg: 'green',
-    label: `${team}`,
+    label: `${currentTeam}`,
     tags: true,
     border: border
   })
