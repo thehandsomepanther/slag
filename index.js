@@ -25,7 +25,6 @@ let userList = {}
 let currentTeam = ''
 
 function* screenGenerator() {
-  var i = 0
   for (var i = 0; i < 3; i++) {
     var data = yield
 
@@ -70,11 +69,19 @@ function prepareScreen() {
 
   bot.message((message) => {
     if (message.channel == currentChannel) {
-      if (message.user != lastMessager) {
-        log.log(userList[message.user])
-        lastMessager = message.user
+      if (message.subtype != undefined) {
+        switch(message.subtype) {
+          default:
+            log.log(`{blue-fg}${message.text}{/blue-fg}`)
+            break
+        }
+      } else {
+        if (message.user != lastMessager) {
+          log.log(userList[message.user])
+          lastMessager = message.user
+        }
+        log.log(`{white-fg}${message.text}{/white-fg}`)
       }
-      log.log(`{white-fg}${message.text}{/white-fg}`)
     }
   })
 
