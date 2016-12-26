@@ -26,9 +26,8 @@ let currentTeam = ''
 
 function* screenGenerator() {
   var i = 0
-  while (i < 3) {
+  for (var i = 0; i < 3; i++) {
     var data = yield
-    console.log(Object.keys(data))
 
     switch(Object.keys(data)[0]) {
       case 'getChannels':
@@ -39,14 +38,12 @@ function* screenGenerator() {
         break
       case 'getTeams':
         currentTeam = data['getTeams']
-        console.log(currentTeam)
         break
       default:
         break
     }
-
-    i++
   }
+
   prepareScreen()
 }
 
@@ -54,6 +51,7 @@ let gen = screenGenerator()
 
 let lastMessager = ''
 
+gen.next()
 getTeams(token, gen)
 getChannels(token, gen)
 getUsers(token, gen)
