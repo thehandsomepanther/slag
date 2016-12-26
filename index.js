@@ -3,15 +3,15 @@ let contrib = require('blessed-contrib')
 let env = require('node-env-file')
 let slack = require('slack')
 
-let getChannels = require('./getChannels')
-let getTeams = require('./getTeams')
-let getUsers = require('./getUsers')
+let getChannels = require('./util/getChannels')
+let getTeams = require('./util/getTeams')
+let getUsers = require('./util/getUsers')
 
 env(__dirname + '/.env')
 
 let bot = slack.rtm.client()
 let token = process.env.SLACK_TOKEN
-// bot.listen({token})
+bot.listen({token})
 
 let screen = blessed.screen()
 let grid = new contrib.grid({
