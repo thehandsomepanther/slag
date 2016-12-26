@@ -2,6 +2,8 @@ let blessed = require('blessed')
 let contrib = require('blessed-contrib')
 let env = require('node-env-file')
 let slack = require('slack')
+let wordwrap = require('wordwrap')
+let wrap
 
 let getChannels = require('./util/getChannels')
 let getTeams = require('./util/getTeams')
@@ -67,12 +69,17 @@ function prepareScreen() {
     scrollable: true
   })
 
+  wrap = wordwrap(log.width-2)
+
   bot.message((message) => {
     if (message.channel == currentChannel) {
+      var chatmessage = message.text != undefined ?
+        wrap(message.text).split('\n') : ['']
+
       if (message.subtype != undefined) {
         switch(message.subtype) {
           default:
-            log.log(`{blue-fg}${message.text}{/blue-fg}`)
+            log.log(`{blue-fg}${chatmessage[chat]}{/blue-fg}`)
             break
         }
       } else {
@@ -80,7 +87,9 @@ function prepareScreen() {
           log.log(userList[message.user])
           lastMessager = message.user
         }
-        log.log(`{white-fg}${message.text}{/white-fg}`)
+        for (var chat in chatmessage) {
+          log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
+        }
       }
     }
   })
@@ -144,6 +153,10 @@ function prepareScreen() {
   screen.key(['escape', 'C-c'], (ch, key) => {
     return process.exit(0);
   });
+
+  screen.on('resize', () => {
+    wrap = wordwrap(log.width-2)
+  })
 
   screen.render()
 }
