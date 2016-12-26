@@ -26,7 +26,7 @@ let currentChannel = ''
 let userList = {}
 let currentTeam = ''
 
-function* screenGenerator() {
+function* dataGenerator() {
   for (var i = 0; i < 3; i++) {
     var data = yield
 
@@ -48,7 +48,7 @@ function* screenGenerator() {
   prepareScreen()
 }
 
-let gen = screenGenerator()
+let gen = dataGenerator()
 
 let lastMessager = ''
 
@@ -79,8 +79,10 @@ function prepareScreen() {
       if (message.subtype != undefined) {
         switch(message.subtype) {
           default:
-            log.log(`{blue-fg}${chatmessage[chat]}{/blue-fg}`)
             break
+        }
+        for (var chat in chatmessage) {
+          log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
         }
       } else {
         if (message.user != lastMessager) {
