@@ -19,9 +19,22 @@ let channelList = {}
 let userList = {}
 let currentChannel = ''
 let lastMessager = ''
+let team = ''
 
 let border = {type: "line", fg: "cyan"}
 let focusBorder = {type: "line", fg: "green"}
+
+function* screenGenerator() {
+  yield
+  yield
+  prepareScreen()
+}
+
+let gen = screenGenerator()
+
+getChannels()
+getUsers()
+getTeam()
 
 function getChannels() {
   channelTree = {
@@ -55,7 +68,7 @@ function getChannels() {
       }
     }
 
-    getUsers()
+    gen.next()
   })
 }
 
@@ -70,12 +83,15 @@ function getUsers() {
       }
     }
 
-    getMessages()
+    gen.next()
   })
 }
 
-function getMessages() {
-  prepareScreen()
+function getTeam() {
+  slack.team.info({token}, (err, data) => {
+    team = data.team.name
+    gen.next()
+  })
 }
 
 function prepareScreen() {
@@ -120,7 +136,7 @@ function prepareScreen() {
 
   let tree = grid.set(0, 0, 12, 4, contrib.tree, {
     fg: 'green',
-    label: 'Channels',
+    label: `${team}`,
     tags: true,
     border: border
   })
@@ -159,5 +175,3 @@ function prepareScreen() {
 
   screen.render()
 }
-
-getChannels()
