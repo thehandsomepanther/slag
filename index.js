@@ -133,6 +133,7 @@ function prepareScreen() {
       lastMessager = ''
     }
 
+    getHistory(currentChannel, log)
     screen.render()
   })
 
@@ -160,5 +161,32 @@ function prepareScreen() {
     wrap = wordwrap(log.width-2)
   })
 
+  getHistory(currentChannel, log)
   screen.render()
+}
+
+function getHistory(channel, log) {
+  slack.channels.history({
+    token: token,
+    channel: channel
+  }, (err, data) => {
+    if (err) {
+      return
+    }
+
+    for (var message in data.messages.reverse()) {
+      message = data.messages[message]
+
+      var chatmessage = message.text != undefined ?
+        wrap(message.text).split('\n') : ['']
+
+      if (message.user != undefined && message.user != lastMessager) {
+        log.log(userList[message.user])
+        lastMessager = message.user
+      }
+      for (var chat in chatmessage) {
+        log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
+      }
+    }
+  })
 }
