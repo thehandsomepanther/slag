@@ -23,8 +23,7 @@ module.exports = function getChannels(token, gen) {
 
   slack.channels.list({token}, (err, data) => {
     var channels = data.channels
-    for (var channel in channels) {
-      channel = channels[channel]
+    for (let channel of channels) {
       channelTree
         .children[channel.is_member ? 'Your Channels' : 'Other Channels']
         .children[channel.name] = {'id': channel.id}

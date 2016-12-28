@@ -174,9 +174,7 @@ function getHistory(channel, log) {
       return
     }
 
-    for (var message in data.messages.reverse()) {
-      message = data.messages[message]
-
+    for (let message of data.messages.reverse()) {
       var chatmessage = message.text != undefined ?
         wrap(message.text).split('\n') : ['']
 
