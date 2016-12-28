@@ -192,9 +192,14 @@ function logMessage(message, log) {
 function parseMessage(text) {
   let message = text
   let userReg = /<@([^>\|]*)\|?([^>]*)>/g
+  let groupReg = /<!([^>\|]*)\|?@?([^>]*)>/g
+
   let match
   while (match = userReg.exec(text)) {
     message = _.replace(message, match[0], `{red-fg}@${userList[match[1]]}{/red-fg}`)
+  }
+  while (match = groupReg.exec(text)) {
+    message = _.replace(message, match[0], `{red-fg}@${match[2].length?match[2]:match[1]}{/red-fg}`)
   }
   return message
 }
