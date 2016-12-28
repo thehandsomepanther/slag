@@ -13,8 +13,9 @@ let getUsers = require('./util/getUsers')
 env(__dirname + '/.env')
 
 let bot = slack.rtm.client()
-let token = process.env.SLACK_TOKEN
-bot.listen({token})
+let tokens = process.env.SLACK_TOKENS.split(" ")
+let t = 0
+let token = tokens[t]
 
 let screen = blessed.screen()
 let grid = new contrib.grid({
@@ -52,12 +53,15 @@ function* dataGenerator(n) {
   prepareScreen()
 }
 
-let gen = dataGenerator(setup.length)
-gen.next()
-
-for (let func of setup) {
-  func(token, gen)
+function getData() {
+  let gen = dataGenerator(setup.length)
+  gen.next()
+  for (let func of setup) {
+    func(token, gen)
+  }
 }
+
+getData()
 
 let border = {type: "line", fg: "white"}
 let focusBorder = {type: "line", fg: "green"}
@@ -135,6 +139,13 @@ function prepareScreen() {
   screen.key(['escape', 'C-c'], (ch, key) => {
     return process.exit(0);
   });
+
+  screen.key(['C-t'], (ch, key) => {
+    t = (t + 1) % tokens.length
+    token = tokens[t]
+    bot.listen({token})
+    getData()
+  })
 
   screen.on('resize', () => {
     init(currentChannel, log)
