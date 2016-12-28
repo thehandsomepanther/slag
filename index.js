@@ -108,7 +108,7 @@ function prepareScreen() {
       currentChannel = node.id
       input.setLabel(`Message #${channelList[currentChannel]}`)
       log.setLabel(`#${channelList[currentChannel]}`)
-      log.clearItems()
+      log.logLines = []
       lastMessager = ''
     }
 
@@ -174,7 +174,12 @@ function logMessage(message, log) {
       case 'bot_message':
         lastMessager = message.bot_id
         log.log(`{green-fg}${message.username ? message.username : `A Bot (${message.bot_id})`}{/green-fg}`)
-        chatmessage = chatmessage[0].length ? chatmessage : wrap(parseMessage(message.attachments[0].text)).split('\n')
+        if (message.attachments != undefined) {
+          chatmessage = []
+          for (let attachment of message.attachments) {
+            chatmessage.push(parseMessage(attachment.text).split('\n'))
+          }
+        }
         break
       default:
         break
@@ -189,6 +194,7 @@ function logMessage(message, log) {
   for (var chat in chatmessage) {
     log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
   }
+  screen.render()
 }
 
 function parseMessage(text) {
