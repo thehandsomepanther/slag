@@ -141,10 +141,12 @@ function prepareScreen() {
   });
 
   screen.key(['C-t'], (ch, key) => {
-    t = (t + 1) % tokens.length
-    token = tokens[t]
-    bot.listen({token})
-    getData()
+    if (tokens.length > 1) {
+      t = (t + 1) % tokens.length
+      token = tokens[t]
+      bot.listen({token})
+      getData()
+    }
   })
 
   screen.on('resize', () => {
