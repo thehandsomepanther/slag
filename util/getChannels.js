@@ -17,6 +17,18 @@ module.exports = function getChannels(token, gen) {
         children: {
 
         }
+      },
+      'Group Messages': {
+        extended: false,
+        children: {
+
+        }
+      },
+      'Direct Messages': {
+        extended: false,
+        children: {
+
+        }
       }
     }
   }
@@ -34,8 +46,26 @@ module.exports = function getChannels(token, gen) {
       }
     }
 
-    gen.next({
-      'getChannels': [channelTree, channelList, currentChannel]
+    slack.groups.list({token}, (err, data) => {
+      var groups = data.groups
+      for (let group of groups) {
+        channelTree
+          .children['Group Messages'].children[group.name] = {'id': group.id}
+        channelList[group.id] = group.name
+      }
+
+      slack.im.list({token}, (err, data) => {
+        var ims = data.ims
+        for (let im of ims) {
+          channelTree
+            .children['Direct Messages'].children[im.user] = {'id': im.id}
+          channelList[im.id] = im.user
+        }
+
+        gen.next({
+          'getChannels': [channelTree, channelList, currentChannel]
+        })
+      })
     })
   })
 }

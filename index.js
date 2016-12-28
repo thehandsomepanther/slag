@@ -26,9 +26,12 @@ let channelList = {}
 let currentChannel = ''
 let userList = {}
 let currentTeam = ''
+let lastMessager = ''
 
-function* dataGenerator() {
-  for (var i = 0; i < 3; i++) {
+let setup = [getTeams, getChannels, getUsers]
+
+function* dataGenerator(n) {
+  for (var i = 0; i < n; i++) {
     var data = yield
 
     switch(Object.keys(data)[0]) {
@@ -49,14 +52,12 @@ function* dataGenerator() {
   prepareScreen()
 }
 
-let gen = dataGenerator()
-
-let lastMessager = ''
-
+let gen = dataGenerator(setup.length)
 gen.next()
-getTeams(token, gen)
-getChannels(token, gen)
-getUsers(token, gen)
+
+for (let func of setup) {
+  func(token, gen)
+}
 
 let border = {type: "line", fg: "white"}
 let focusBorder = {type: "line", fg: "green"}
@@ -110,10 +111,9 @@ function prepareScreen() {
       log.setLabel(`#${channelList[currentChannel]}`)
       log.logLines = []
       lastMessager = ''
+      getHistory(currentChannel, log)
+      screen.render()
     }
-
-    getHistory(currentChannel, log)
-    screen.render()
   })
 
   tree.setData(channelTree)
@@ -151,18 +151,46 @@ function init(currentChannel, log) {
 }
 
 function getHistory(channel, log) {
-  slack.channels.history({
-    token: token,
-    channel: channel
-  }, (err, data) => {
-    if (err) {
-      return
-    }
+  switch(channel[0]) {
+    case 'C':
+      slack.channels.history({
+        token: token,
+        channel: channel
+      }, (err, data) => {
+        if (err) return
 
-    for (let message of data.messages.reverse()) {
-      logMessage(message, log)
-    }
-  })
+        for (let message of data.messages.reverse()) {
+          logMessage(message, log)
+        }
+      })
+      break
+    case 'G':
+      slack.groups.history({
+        token: token,
+        channel: channel
+      }, (err, data) => {
+        if (err) return
+
+        for (let message of data.messages.reverse()) {
+          logMessage(message, log)
+        }
+      })
+      break
+    case 'D':
+      slack.im.history({
+        token: token,
+        channel: channel
+      }, (err, data) => {
+        if (err) return
+
+        for (let message of data.messages.reverse()) {
+          logMessage(message, log)
+        }
+      })
+      break
+    default:
+      break
+  }
 }
 
 function logMessage(message, log) {
