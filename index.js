@@ -2,12 +2,14 @@ let blessed = require('blessed')
 let contrib = require('blessed-contrib')
 let env = require('node-env-file')
 let slack = require('slack')
+let _ = require('lodash')
 let wordwrap = require('wordwrap')
 let wrap
 
 let getChannels = require('./util/getChannels')
 let getTeams = require('./util/getTeams')
 let getUsers = require('./util/getUsers')
+// let logMessage = require('./util/logMessage')
 
 env(__dirname + '/.env')
 
@@ -57,50 +59,29 @@ getTeams(token, gen)
 getChannels(token, gen)
 getUsers(token, gen)
 
-let border = {type: "line", fg: "cyan"}
+let border = {type: "line", fg: "white"}
 let focusBorder = {type: "line", fg: "green"}
 
 function prepareScreen() {
-  var log = grid.set(0, 4, 11, 8, contrib.log, {
-    border: border,
-    fg: "green",
+  let log = grid.set(0, 4, 11, 8, contrib.log, {
     label: `#${channelList[currentChannel]}`,
     tags: true,
     scrollable: true
   })
 
-  wrap = wordwrap(log.width-2)
+  log.style.border = border
 
   bot.message((message) => {
     if (message.channel == currentChannel) {
-      var chatmessage = message.text != undefined ?
-        wrap(message.text).split('\n') : ['']
-
-      if (message.subtype != undefined) {
-        switch(message.subtype) {
-          default:
-            break
-        }
-        for (var chat in chatmessage) {
-          log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
-        }
-      } else {
-        if (message.user != lastMessager) {
-          log.log(userList[message.user])
-          lastMessager = message.user
-        }
-        for (var chat in chatmessage) {
-          log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
-        }
-      }
+      logMessage(message, log)
     }
   })
 
   var input = grid.set(11, 4, 1.5, 8, blessed.textbox, {
     keys: true,
     label: `Message #${channelList[currentChannel]}`,
-    border: border
   })
+  input.style.border = border
 
   input.on('submit', (data) => {
     var message = input.getValue()
@@ -118,11 +99,10 @@ function prepareScreen() {
   })
 
   let tree = grid.set(0, 0, 12, 4, contrib.tree, {
-    fg: 'green',
     label: `${currentTeam}`,
     tags: true,
-    border: border
   })
+  tree.style.border = border
 
   tree.on('select', (node) => {
     if (node.children == undefined && node.id != currentChannel) {
@@ -158,9 +138,15 @@ function prepareScreen() {
   });
 
   screen.on('resize', () => {
-    wrap = wordwrap(log.width-2)
+    init(currentChannel, log)
   })
 
+  init(currentChannel, log)
+}
+
+function init(currentChannel, log) {
+  log.clearItems()
+  wrap = wordwrap(log.width-2)
   getHistory(currentChannel, log)
   screen.render()
 }
@@ -175,16 +161,40 @@ function getHistory(channel, log) {
     }
 
     for (let message of data.messages.reverse()) {
-      var chatmessage = message.text != undefined ?
-        wrap(message.text).split('\n') : ['']
-
-      if (message.user != undefined && message.user != lastMessager) {
-        log.log(userList[message.user])
-        lastMessager = message.user
-      }
-      for (var chat in chatmessage) {
-        log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
-      }
+      logMessage(message, log)
     }
   })
+}
+
+function logMessage(message, log) {
+  var chatmessage = message.text != undefined ?
+    wrap(parseMessage(message.text)).split('\n') : ['']
+
+  if (message.subtype != undefined) {
+    switch(message.subtype) {
+      default:
+        break
+    }
+    for (var chat in chatmessage) {
+      log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
+    }
+  } else {
+    if (message.user != lastMessager) {
+      log.log(`{green-fg}${userList[message.user]}{/green-fg}`)
+      lastMessager = message.user
+    }
+    for (var chat in chatmessage) {
+      log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
+    }
+  }
+}
+
+function parseMessage(text) {
+  let message = text
+  let userReg = /<@([^>\|]*)\|?([^>]*)>/g
+  let match
+  while (match = userReg.exec(text)) {
+    message = _.replace(message, match[0], `{red-fg}@${userList[match[1]]}{/red-fg}`)
+  }
+  return message
 }
