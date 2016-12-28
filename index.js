@@ -9,7 +9,6 @@ let wrap
 let getChannels = require('./util/getChannels')
 let getTeams = require('./util/getTeams')
 let getUsers = require('./util/getUsers')
-// let logMessage = require('./util/logMessage')
 
 env(__dirname + '/.env')
 
@@ -172,20 +171,23 @@ function logMessage(message, log) {
 
   if (message.subtype != undefined) {
     switch(message.subtype) {
+      case 'bot_message':
+        lastMessager = message.bot_id
+        log.log(`{green-fg}${message.username ? message.username : `A Bot (${message.bot_id})`}{/green-fg}`)
+        chatmessage = chatmessage[0].length ? chatmessage : wrap(parseMessage(message.attachments[0].text)).split('\n')
+        break
       default:
         break
-    }
-    for (var chat in chatmessage) {
-      log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
     }
   } else {
     if (message.user != lastMessager) {
       log.log(`{green-fg}${userList[message.user]}{/green-fg}`)
       lastMessager = message.user
     }
-    for (var chat in chatmessage) {
-      log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
-    }
+  }
+
+  for (var chat in chatmessage) {
+    log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
   }
 }
 
