@@ -15,9 +15,9 @@ you switch between multiple slack teams, too. all you need to do is include all 
 |Key  |Action|
 |---	|---	|
 |Tab  |Switch between channel tree and message input|
-|Tab  |Switch between channel tree and message input|
 |Ctrl+T|Cycle through teams|
 |Ctrl+C|Quit|
+|Esc  |Quit|
 
 notes:
 this client uses the [blessed](https://github.com/chjj/blessed) library to draw the screen as well as some components from [blessed-contrib](https://github.com/yaronn/blessed-contrib). there is a bug in the blessed-contrib tree widget that was fixed in [this pr](https://github.com/yaronn/blessed-contrib/pull/68) but reverted.
