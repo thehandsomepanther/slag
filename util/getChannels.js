@@ -1,4 +1,5 @@
 let slack = require('slack')
+let _ = require('lodash')
 
 module.exports = function getChannels(token, gen) {
   let currentChannel = ''
@@ -49,6 +50,17 @@ module.exports = function getChannels(token, gen) {
     slack.groups.list({token}, (err, data) => {
       var groups = data.groups
       for (let group of groups) {
+        if (group.name.substring(0, 4) == "mpdm") {
+          let name = _.replace(group.name, 'mpdm', '')
+          let groupReg = /(-([^-]*)-)/g
+          let match
+          while (match = groupReg.exec(name)) {
+            name = _.replace(name, match[0], `${match[2]}, `)
+          }
+
+          group.name = name.substring(0, name.length-3)
+        }
+
         channelTree
           .children['Group Messages'].children[group.name] = {'id': group.id}
         channelList[group.id] = group.name
