@@ -8,6 +8,7 @@ let wrap
 
 let getTeamData = require('./util/getTeamData')
 let parseMessage = require('./util/parseMessage')
+let formatMessage = require('./util/formatMessage')
 
 env(__dirname + '/.env')
 
@@ -40,6 +41,9 @@ function prepareScreen(teamData) {
     currentTeam
   } = teamData
 
+  let userListInverted = _.invert(userList)
+  let channelListInverted = _.invert(channelList)
+
   let log = grid.set(0, 4, 11, 8, contrib.log, {
     label: `#${channelList[currentChannel]}`,
     tags: true,
@@ -54,7 +58,7 @@ function prepareScreen(teamData) {
   input.style.border = border
 
   input.on('submit', (data) => {
-    var message = input.getValue()
+    var message = formatMessage(input.getValue(), userListInverted, channelListInverted)
     input.clearValue()
     screen.render()
     slack.chat.postMessage({
@@ -83,7 +87,7 @@ function prepareScreen(teamData) {
       log.logLines = []
       log.clearItems()
       lastMessager = ''
-      logHistory(log, userList, currentChannel)
+      logHistory(log, userList, channelList, currentChannel)
     }
   })
 
@@ -91,7 +95,7 @@ function prepareScreen(teamData) {
 
   bot.message((message) => {
     if (message.channel == currentChannel) {
-      logMessage(message, log, userList)
+      logMessage(message, log, userList, channelList)
     }
   })
 
@@ -125,21 +129,21 @@ function prepareScreen(teamData) {
   })
 
   screen.on('resize', () => {
-    init(log, userList, currentChannel)
+    init(log, userList, channelList, currentChannel)
   })
 
-  init(log, userList, currentChannel)
+  init(log, userList, channelList, currentChannel)
 }
 
-function init(log, userList, currentChannel) {
+function init(log, userList, channelList, currentChannel) {
   log.clearItems()
   wrap = wordwrap(log.width-2)
-  logHistory(log, userList, currentChannel)
+  logHistory(log, userList, channelList, currentChannel)
 }
 
-function logMessage(message, log, userList) {
+function logMessage(message, log, userList, channelList) {
   let chatmessage = message.text != undefined ?
-    wrap(parseMessage(message.text, userList)).split('\n') : ['']
+    wrap(parseMessage(message.text, userList, channelList)).split('\n') : ['']
 
   if (message.subtype != undefined) {
     switch(message.subtype) {
@@ -151,7 +155,7 @@ function logMessage(message, log, userList) {
           chatmessage = []
           for (let attachment of message.attachments) {
             if (attachment.text) {
-              chatmessage = wrap(parseMessage(attachment.text, userList)).split('\n')
+              chatmessage = wrap(parseMessage(attachment.text, userList, channelList)).split('\n')
             }
           }
         }
@@ -171,27 +175,27 @@ function logMessage(message, log, userList) {
   }
 }
 
-function logHistory(log, userList, channel) {
-  let gen = historyGen(log, userList)
+function logHistory(log, userList, channelList, channel) {
+  let gen = historyGen(log, userList, channelList)
   gen.next()
-  getHistory(channel, log, userList, gen)
+  getHistory(channel, log, gen)
 }
 
-function* historyGen(log, userList) {
+function* historyGen(log, userList, channelList) {
   log.log('Fetching messages...')
   let history = yield
   log.clearItems()
   log.logLines = []
   if (Array.isArray(history)) {
     for (let message of history) {
-      logMessage(message, log, userList)
+      logMessage(message, log, userList, channelList)
     }
   } else {
     log.log(history)
   }
 }
 
-function getHistory(channel, log, userList, gen) {
+function getHistory(channel, log, gen) {
   let api = ''
   switch(channel[0]) {
     case 'C':
