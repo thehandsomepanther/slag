@@ -7,6 +7,7 @@ let wordwrap = require('wordwrap')
 let wrap
 
 let getTeamData = require('./util/getTeamData')
+let parseMessage = require('./util/parseMessage')
 
 env(__dirname + '/.env')
 
@@ -146,11 +147,14 @@ function logMessage(message, log, userList) {
     switch(message.subtype) {
       case 'bot_message':
         lastMessager = message.bot_id
+        // need a better way to handle bot names
         log.log(`{green-fg}${message.username ? message.username : `A Bot (${message.bot_id})`}{/green-fg}`)
         if (message.attachments != undefined) {
           chatmessage = []
           for (let attachment of message.attachments) {
-            chatmessage.push(parseMessage(attachment.text).split('\n'))
+            if (attachment.text) {
+              chatmessage = wrap(parseMessage(attachment.text, userList)).split('\n')
+            }
           }
         }
         break
@@ -167,22 +171,6 @@ function logMessage(message, log, userList) {
   for (let chat of chatmessage) {
     log.log(`{white-fg}${chat}{/white-fg}`)
   }
-}
-
-function parseMessage(text, userList) {
-  let message = text
-  let userReg = /<@([^>\|]*)\|?([^>]*)>/g
-  let groupReg = /<!([^>\|]*)\|?@?([^>]*)>/g
-
-  let match
-  while (match = userReg.exec(text)) {
-    message = message.replace(match[0], `{red-fg}@${userList[match[1]]}{/red-fg}`)
-    message = _.replace(message, match[0], `{red-fg}@${userList[match[1]]}{/red-fg}`)
-  }
-  while (match = groupReg.exec(text)) {
-    message = _.replace(message, match[0], `{red-fg}@${match[2].length?match[2]:match[1]}{/red-fg}`)
-  }
-  return message
 }
 
 function getHistory(channel, log, userList) {
@@ -211,8 +199,12 @@ function getHistory(channel, log, userList) {
     if (err) {
       log.log(err)
     } else {
-      for (let message of data.messages.reverse()) {
-        logMessage(message, log, userList)
+      if (data.messages.length > 0) {
+        for (let message of data.messages.reverse()) {
+          logMessage(message, log, userList)
+        }
+      } else {
+        log.log('This channel has no messages!')
       }
     }
   })
