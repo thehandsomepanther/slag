@@ -1,6 +1,6 @@
 let _ = require('lodash')
 
-module.exports = function formatMessage(text, userList, channelList) {
+module.exports = function formatMessage(text, userList, channelList, currentChannel) {
   let userReg = /@([^\s]*)/g
   let channelReg = /#([^\s]*)/g
 
@@ -8,6 +8,10 @@ module.exports = function formatMessage(text, userList, channelList) {
   while (match = userReg.exec(text)) {
     if (userList[match[1]] != undefined) {
       text = _.replace(text, match[0], `<@${userList[match[1]]}>`)
+    }
+
+    if (match[1] == 'channel' || match[1] == 'here') {
+      text = _.replace(text, match[0], `<!${match[1]}>`)
     }
   }
   while (match = channelReg.exec(text)) {

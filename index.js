@@ -58,7 +58,7 @@ function prepareScreen(teamData) {
   input.style.border = border
 
   input.on('submit', (data) => {
-    var message = formatMessage(input.getValue(), userListInverted, channelListInverted)
+    var message = formatMessage(input.getValue(), userListInverted, channelListInverted, currentChannel)
     input.clearValue()
     screen.render()
     slack.chat.postMessage({
