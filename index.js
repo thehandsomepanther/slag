@@ -83,8 +83,7 @@ function prepareScreen(teamData) {
       log.logLines = []
       log.clearItems()
       lastMessager = ''
-      getHistory(currentChannel, log, userList)
-      screen.render()
+      logHistory(log, userList, currentChannel)
     }
   })
 
@@ -126,17 +125,16 @@ function prepareScreen(teamData) {
   })
 
   screen.on('resize', () => {
-    init(currentChannel, log, userList)
+    init(log, userList, currentChannel)
   })
 
-  init(currentChannel, log, userList)
+  init(log, userList, currentChannel)
 }
 
-function init(currentChannel, log, userList) {
+function init(log, userList, currentChannel) {
   log.clearItems()
   wrap = wordwrap(log.width-2)
-  getHistory(currentChannel, log, userList)
-  screen.render()
+  logHistory(log, userList, currentChannel)
 }
 
 function logMessage(message, log, userList) {
@@ -173,8 +171,27 @@ function logMessage(message, log, userList) {
   }
 }
 
-function getHistory(channel, log, userList) {
+function logHistory(log, userList, channel) {
+  let gen = historyGen(log, userList)
+  gen.next()
+  getHistory(channel, log, userList, gen)
+}
+
+function* historyGen(log, userList) {
   log.log('Fetching messages...')
+  let history = yield
+  log.clearItems()
+  log.logLines = []
+  if (Array.isArray(history)) {
+    for (let message of history) {
+      logMessage(message, log, userList)
+    }
+  } else {
+    log.log(history)
+  }
+}
+
+function getHistory(channel, log, userList, gen) {
   let api = ''
   switch(channel[0]) {
     case 'C':
@@ -194,17 +211,13 @@ function getHistory(channel, log, userList) {
     token: token,
     channel: channel
   }, (err, data) => {
-    log.clearItems()
-    log.logLines = []
     if (err) {
       log.log(err)
     } else {
       if (data.messages.length > 0) {
-        for (let message of data.messages.reverse()) {
-          logMessage(message, log, userList)
-        }
+        gen.next(data.messages.reverse())
       } else {
-        log.log('This channel has no messages!')
+        gen.next('This channel has no messages!')
       }
     }
   })
