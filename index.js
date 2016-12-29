@@ -116,7 +116,9 @@ function prepareScreen(teamData) {
       t = (t + 1) % tokens.length
       token = tokens[t]
       bot.listen({token})
-      getData()
+      getTeamData(token, (teamData) => {
+        prepareScreen(teamData)
+      })
     }
   })
 
@@ -125,6 +127,13 @@ function prepareScreen(teamData) {
   })
 
   init(currentChannel, log, userList)
+}
+
+function init(currentChannel, log, userList) {
+  log.clearItems()
+  wrap = wordwrap(log.width-2)
+  getHistory(currentChannel, log, userList)
+  screen.render()
 }
 
 function logMessage(message, log, userList) {
@@ -174,14 +183,8 @@ function parseMessage(text, userList) {
   return message
 }
 
-function init(currentChannel, log, userList) {
-  log.clearItems()
-  wrap = wordwrap(log.width-2)
-  getHistory(currentChannel, log, userList)
-  screen.render()
-}
-
 function getHistory(channel, log, userList) {
+  log.log('Fetching messages...')
   let api = ''
   switch(channel[0]) {
     case 'C':
@@ -201,9 +204,14 @@ function getHistory(channel, log, userList) {
     token: token,
     channel: channel
   }, (err, data) => {
-    if (err) console.log(err)
-    for (let message of data.messages.reverse()) {
-      logMessage(message, log, userList)
+    log.clearItems()
+    log.logLines = []
+    if (err) {
+      log.log(err)
+    } else {
+      for (let message of data.messages.reverse()) {
+        logMessage(message, log, userList)
+      }
     }
   })
 }
