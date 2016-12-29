@@ -1,6 +1,7 @@
 let slack = require('slack')
 
-module.exports = function getUsers(token, gen) {
+module.exports = function getUsers(token, cb) {
+  var token = token
   let userList = {}
 
   slack.users.list({token}, (err, data) => {
@@ -12,8 +13,6 @@ module.exports = function getUsers(token, gen) {
       }
     }
 
-    gen.next({
-      'getUsers': userList
-    })
+    cb(userList)
   })
 }

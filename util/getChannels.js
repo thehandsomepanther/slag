@@ -1,7 +1,8 @@
 let slack = require('slack')
 let _ = require('lodash')
 
-module.exports = function getChannels(token, gen) {
+module.exports = function getChannels(token, userList, cb) {
+  var token = token
   let currentChannel = ''
   let channelList = {}
   let channelTree = {
@@ -70,13 +71,11 @@ module.exports = function getChannels(token, gen) {
         var ims = data.ims
         for (let im of ims) {
           channelTree
-            .children['Direct Messages'].children[im.user] = {'id': im.id}
-          channelList[im.id] = im.user
+            .children['Direct Messages'].children[userList[im.user]] = {'id': im.id}
+          channelList[im.id] = userList[im.user]
         }
 
-        gen.next({
-          'getChannels': [channelTree, channelList, currentChannel]
-        })
+        cb([channelTree, channelList, currentChannel])
       })
     })
   })

@@ -6,9 +6,7 @@ let _ = require('lodash')
 let wordwrap = require('wordwrap')
 let wrap
 
-let getChannels = require('./util/getChannels')
-let getTeams = require('./util/getTeams')
-let getUsers = require('./util/getUsers')
+let getTeamData = require('./util/getTeamData')
 
 env(__dirname + '/.env')
 
@@ -22,66 +20,32 @@ let grid = new contrib.grid({
   rows: 12, cols: 12, screen: screen
 })
 
-let channelTree = {}
-let channelList = {}
-let currentChannel = ''
-let userList = {}
-let currentTeam = ''
 let lastMessager = ''
 
-let setup = [getTeams, getChannels, getUsers]
-
-function* dataGenerator(n) {
-  for (var i = 0; i < n; i++) {
-    var data = yield
-
-    switch(Object.keys(data)[0]) {
-      case 'getChannels':
-        [channelTree, channelList, currentChannel] = data['getChannels']
-        break
-      case 'getUsers':
-        userList = data['getUsers']
-        break
-      case 'getTeams':
-        currentTeam = data['getTeams']
-        break
-      default:
-        break
-    }
-  }
-
-  prepareScreen()
-}
-
-function getData() {
-  let gen = dataGenerator(setup.length)
-  gen.next()
-  for (let func of setup) {
-    func(token, gen)
-  }
-}
-
-getData()
+getTeamData(token, (teamData) => {
+  prepareScreen(teamData)
+})
 
 let border = {type: "line", fg: "white"}
 let focusBorder = {type: "line", fg: "green"}
 
-function prepareScreen() {
+function prepareScreen(teamData) {
+  let {
+    channelTree,
+    channelList,
+    currentChannel,
+    userList,
+    currentTeam
+  } = teamData
+
   let log = grid.set(0, 4, 11, 8, contrib.log, {
     label: `#${channelList[currentChannel]}`,
     tags: true,
     scrollable: true
   })
-
   log.style.border = border
 
-  bot.message((message) => {
-    if (message.channel == currentChannel) {
-      logMessage(message, log)
-    }
-  })
-
-  var input = grid.set(11, 4, 1.5, 8, blessed.textbox, {
+  let input = grid.set(11, 4, 1.5, 8, blessed.textbox, {
     keys: true,
     label: `Message #${channelList[currentChannel]}`,
   })
@@ -114,13 +78,20 @@ function prepareScreen() {
       input.setLabel(`Message #${channelList[currentChannel]}`)
       log.setLabel(`#${channelList[currentChannel]}`)
       log.logLines = []
+      log.clearItems()
       lastMessager = ''
-      getHistory(currentChannel, log)
+      getHistory(currentChannel, log, userList)
       screen.render()
     }
   })
 
   tree.setData(channelTree)
+
+  bot.message((message) => {
+    if (message.channel == currentChannel) {
+      logMessage(message, log, userList)
+    }
+  })
 
   let foci = [tree, input]
   var currentFocus = 0
@@ -150,65 +121,15 @@ function prepareScreen() {
   })
 
   screen.on('resize', () => {
-    init(currentChannel, log)
+    init(currentChannel, log, userList)
   })
 
-  init(currentChannel, log)
+  init(currentChannel, log, userList)
 }
 
-function init(currentChannel, log) {
-  log.clearItems()
-  wrap = wordwrap(log.width-2)
-  getHistory(currentChannel, log)
-  screen.render()
-}
-
-function getHistory(channel, log) {
-  switch(channel[0]) {
-    case 'C':
-      slack.channels.history({
-        token: token,
-        channel: channel
-      }, (err, data) => {
-        if (err) return
-
-        for (let message of data.messages.reverse()) {
-          logMessage(message, log)
-        }
-      })
-      break
-    case 'G':
-      slack.groups.history({
-        token: token,
-        channel: channel
-      }, (err, data) => {
-        if (err) return
-
-        for (let message of data.messages.reverse()) {
-          logMessage(message, log)
-        }
-      })
-      break
-    case 'D':
-      slack.im.history({
-        token: token,
-        channel: channel
-      }, (err, data) => {
-        if (err) return
-
-        for (let message of data.messages.reverse()) {
-          logMessage(message, log)
-        }
-      })
-      break
-    default:
-      break
-  }
-}
-
-function logMessage(message, log) {
-  var chatmessage = message.text != undefined ?
-    wrap(parseMessage(message.text)).split('\n') : ['']
+function logMessage(message, log, userList) {
+  let chatmessage = message.text != undefined ?
+    wrap(parseMessage(message.text, userList)).split('\n') : ['']
 
   if (message.subtype != undefined) {
     switch(message.subtype) {
@@ -232,23 +153,57 @@ function logMessage(message, log) {
     }
   }
 
-  for (var chat in chatmessage) {
-    log.log(`{white-fg}${chatmessage[chat]}{/white-fg}`)
+  for (let chat of chatmessage) {
+    log.log(`{white-fg}${chat}{/white-fg}`)
   }
-  screen.render()
 }
 
-function parseMessage(text) {
+function parseMessage(text, userList) {
   let message = text
   let userReg = /<@([^>\|]*)\|?([^>]*)>/g
   let groupReg = /<!([^>\|]*)\|?@?([^>]*)>/g
 
   let match
   while (match = userReg.exec(text)) {
+    message = message.replace(match[0], `{red-fg}@${userList[match[1]]}{/red-fg}`)
     message = _.replace(message, match[0], `{red-fg}@${userList[match[1]]}{/red-fg}`)
   }
   while (match = groupReg.exec(text)) {
     message = _.replace(message, match[0], `{red-fg}@${match[2].length?match[2]:match[1]}{/red-fg}`)
   }
   return message
+}
+
+function init(currentChannel, log, userList) {
+  log.clearItems()
+  wrap = wordwrap(log.width-2)
+  getHistory(currentChannel, log, userList)
+  screen.render()
+}
+
+function getHistory(channel, log, userList) {
+  let api = ''
+  switch(channel[0]) {
+    case 'C':
+      api = 'channels'
+      break
+    case 'G':
+      api = 'groups'
+      break
+    case 'D':
+      api = 'im'
+      break
+    default:
+      break
+  }
+
+  slack[api].history({
+    token: token,
+    channel: channel
+  }, (err, data) => {
+    if (err) console.log(err)
+    for (let message of data.messages.reverse()) {
+      logMessage(message, log, userList)
+    }
+  })
 }
