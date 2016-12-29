@@ -14,6 +14,7 @@ let bot = slack.rtm.client()
 let tokens = process.env.SLACK_TOKENS.split(" ")
 let t = 0
 let token = tokens[t]
+bot.listen({token})
 
 let screen = blessed.screen()
 let grid = new contrib.grid({
@@ -54,6 +55,7 @@ function prepareScreen(teamData) {
   input.on('submit', (data) => {
     var message = input.getValue()
     input.clearValue()
+    screen.render()
     slack.chat.postMessage({
       token: token,
       channel: currentChannel,
