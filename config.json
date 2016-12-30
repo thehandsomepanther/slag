@@ -1,0 +1,10 @@
+{
+  "border": {
+    "type": "line",
+    "fg": "white"
+  },
+  "focusBorder": {
+    "type": "line",
+    "fg": "green"
+  }
+}

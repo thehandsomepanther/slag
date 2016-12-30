@@ -3,6 +3,7 @@ let contrib = require('blessed-contrib')
 let env = require('node-env-file')
 let slack = require('slack')
 let _ = require('lodash')
+let {border, focusBorder} = require('jsonFile').readFileSync('./config.json')
 let wordwrap = require('wordwrap')
 let wrap
 
@@ -23,14 +24,21 @@ let grid = new contrib.grid({
   rows: 12, cols: 12, screen: screen
 })
 
+screen.key(['C-t'], (ch, key) => {
+  if (tokens.length > 1) {
+    debugger
+    token = tokens[(++t) % tokens.length]
+    getTeamData(token, (teamData) => {
+      prepareScreen(teamData)
+    })
+  }
+})
+
 let lastMessager = ''
 
 getTeamData(token, (teamData) => {
   prepareScreen(teamData)
 })
-
-let border = {type: "line", fg: "white"}
-let focusBorder = {type: "line", fg: "green"}
 
 function prepareScreen(teamData) {
   let {
@@ -116,17 +124,6 @@ function prepareScreen(teamData) {
   screen.key(['escape', 'C-c'], (ch, key) => {
     return process.exit(0);
   });
-
-  screen.key(['C-t'], (ch, key) => {
-    if (tokens.length > 1) {
-      t = (t + 1) % tokens.length
-      token = tokens[t]
-      bot.listen({token})
-      getTeamData(token, (teamData) => {
-        prepareScreen(teamData)
-      })
-    }
-  })
 
   screen.on('resize', () => {
     init(log, userList, channelList, currentChannel)
@@ -216,7 +213,8 @@ function getHistory(channel, log, gen) {
     channel: channel
   }, (err, data) => {
     if (err) {
-      log.log(err)
+      console.log(err)
+      // gen.next("Oops! We weren't able to get messages right now. Try again later.")
     } else {
       if (data.messages.length > 0) {
         gen.next(data.messages.reverse())
