@@ -1,11 +1,10 @@
 let blessed = require('blessed')
 let contrib = require('blessed-contrib')
+let slackLog = require('./lib/widget/slackLog')
 let env = require('node-env-file')
 let slack = require('slack')
 let _ = require('lodash')
 let {border, focusBorder} = require('jsonFile').readFileSync('./config.json')
-let wordwrap = require('wordwrap')
-let wrap
 
 let getTeamData = require('./util/getTeamData')
 let parseMessage = require('./util/parseMessage')
@@ -26,15 +25,12 @@ let grid = new contrib.grid({
 
 screen.key(['C-t'], (ch, key) => {
   if (tokens.length > 1) {
-    debugger
     token = tokens[(++t) % tokens.length]
     getTeamData(token, (teamData) => {
       prepareScreen(teamData)
     })
   }
 })
-
-let lastMessager = ''
 
 getTeamData(token, (teamData) => {
   prepareScreen(teamData)
@@ -52,10 +48,12 @@ function prepareScreen(teamData) {
   let userListInverted = _.invert(userList)
   let channelListInverted = _.invert(channelList)
 
-  let log = grid.set(0, 4, 11, 8, contrib.log, {
+  let log = grid.set(0, 4, 11, 8, slackLog, {
     label: `#${channelList[currentChannel]}`,
     tags: true,
-    scrollable: true
+    scrollable: true,
+    channelList,
+    userList
   })
   log.style.border = border
 
@@ -123,7 +121,7 @@ function prepareScreen(teamData) {
 
   screen.key(['escape', 'C-c'], (ch, key) => {
     return process.exit(0);
-  });
+  })
 
   screen.on('resize', () => {
     init(log, userList, channelList, currentChannel)
@@ -134,42 +132,7 @@ function prepareScreen(teamData) {
 
 function init(log, userList, channelList, currentChannel) {
   log.clearItems()
-  wrap = wordwrap(log.width-2)
   logHistory(log, userList, channelList, currentChannel)
-}
-
-function logMessage(message, log, userList, channelList) {
-  let chatmessage = message.text != undefined ?
-    wrap(parseMessage(message.text, userList, channelList)).split('\n') : ['']
-
-  if (message.subtype != undefined) {
-    switch(message.subtype) {
-      case 'bot_message':
-        lastMessager = message.bot_id
-        // need a better way to handle bot names
-        log.log(`{green-fg}${message.username ? message.username : `A Bot (${message.bot_id})`}{/green-fg}`)
-        if (message.attachments != undefined) {
-          chatmessage = []
-          for (let attachment of message.attachments) {
-            if (attachment.text) {
-              chatmessage = wrap(parseMessage(attachment.text, userList, channelList)).split('\n')
-            }
-          }
-        }
-        break
-      default:
-        break
-    }
-  } else {
-    if (message.user != lastMessager) {
-      log.log(`{green-fg}${userList[message.user]}{/green-fg}`)
-      lastMessager = message.user
-    }
-  }
-
-  for (let chat of chatmessage) {
-    log.log(`{white-fg}${chat}{/white-fg}`)
-  }
 }
 
 function logHistory(log, userList, channelList, channel) {
@@ -185,7 +148,7 @@ function* historyGen(log, userList, channelList) {
   log.logLines = []
   if (Array.isArray(history)) {
     for (let message of history) {
-      logMessage(message, log, userList, channelList)
+      log.logMessage(message)
     }
   } else {
     log.log(history)
@@ -213,8 +176,7 @@ function getHistory(channel, log, gen) {
     channel: channel
   }, (err, data) => {
     if (err) {
-      console.log(err)
-      // gen.next("Oops! We weren't able to get messages right now. Try again later.")
+      gen.next("Oops! We weren't able to get messages right now. Try again later.")
     } else {
       if (data.messages.length > 0) {
         gen.next(data.messages.reverse())
