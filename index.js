@@ -27,6 +27,7 @@ let grid = new contrib.grid({
 screen.key(['C-t'], (ch, key) => {
   if (tokens.length > 1) {
     token = tokens[(++t) % tokens.length]
+    bot.listen({token})
     getTeamData(token, (teamData) => {
       prepareScreen(teamData)
     })
@@ -134,5 +135,4 @@ function prepareScreen(teamData) {
 function init(token, log, currentChannel) {
   log.clearItems()
   logHistory(token, log, currentChannel)
-  screen.render()
 }
