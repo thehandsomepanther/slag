@@ -9,6 +9,7 @@ let {border, focusBorder} = require('jsonFile').readFileSync('./config.json')
 let getTeamData = require('./util/getTeamData')
 let parseMessage = require('./util/parseMessage')
 let formatMessage = require('./util/formatMessage')
+let logHistory = require('./util/logHistory')
 
 env(__dirname + '/.env')
 
@@ -93,7 +94,7 @@ function prepareScreen(teamData) {
       log.logLines = []
       log.clearItems()
       lastMessager = ''
-      logHistory(log, currentChannel)
+      logHistory(token, log, currentChannel)
     }
   })
 
@@ -101,7 +102,7 @@ function prepareScreen(teamData) {
 
   bot.message((message) => {
     if (message.channel == currentChannel) {
-      logMessage(message)
+      log.logMessage(message)
     }
   })
 
@@ -127,62 +128,11 @@ function prepareScreen(teamData) {
     init(log, currentChannel)
   })
 
-  init(log, currentChannel)
+  init(token, log, currentChannel)
 }
 
-function init(log, currentChannel) {
+function init(token, log, currentChannel) {
   log.clearItems()
-  logHistory(log, currentChannel)
-}
-
-function logHistory(log, channel) {
-  let gen = historyGen(log)
-  gen.next()
-  getHistory(channel, gen)
-}
-
-function* historyGen(log) {
-  log.log('Fetching messages...')
-  let history = yield
-  log.clearItems()
-  log.logLines = []
-  if (Array.isArray(history)) {
-    for (let message of history) {
-      log.logMessage(message)
-    }
-  } else {
-    log.log(history)
-  }
-}
-
-function getHistory(channel, gen) {
-  let api = ''
-  switch(channel[0]) {
-    case 'C':
-      api = 'channels'
-      break
-    case 'G':
-      api = 'groups'
-      break
-    case 'D':
-      api = 'im'
-      break
-    default:
-      break
-  }
-
-  slack[api].history({
-    token: token,
-    channel: channel
-  }, (err, data) => {
-    if (err) {
-      gen.next("Oops! We weren't able to get messages right now. Try again later.")
-    } else {
-      if (data.messages.length > 0) {
-        gen.next(data.messages.reverse())
-      } else {
-        gen.next('This channel has no messages!')
-      }
-    }
-  })
+  logHistory(token, log, currentChannel)
+  screen.render()
 }

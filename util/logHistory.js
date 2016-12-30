@@ -1,27 +1,26 @@
 let slack = require('slack')
-let logMessage = require('./logMessage')
 
-module.exports = function logHistory(log, userList, channelList, channel, wrap) {
-  let gen = historyGen(log, userList, channelList)
+module.exports = function logHistory(token, log, channel) {
+  let gen = historyGen(log)
   gen.next()
-  getHistory(channel, log, gen)
+  getHistory(token, channel, gen)
 }
 
-function* historyGen(log, userList, channelList, wrap) {
+function* historyGen(log) {
   log.log('Fetching messages...')
   let history = yield
   log.clearItems()
   log.logLines = []
   if (Array.isArray(history)) {
     for (let message of history) {
-      logMessage(message, log, userList, channelList, wrap)
+      log.logMessage(message)
     }
   } else {
     log.log(history)
   }
 }
 
-function getHistory(channel, log, gen) {
+function getHistory(token, channel, gen) {
   let api = ''
   switch(channel[0]) {
     case 'C':
