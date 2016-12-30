@@ -93,7 +93,7 @@ function prepareScreen(teamData) {
       log.logLines = []
       log.clearItems()
       lastMessager = ''
-      logHistory(log, userList, channelList, currentChannel)
+      logHistory(log, currentChannel)
     }
   })
 
@@ -101,7 +101,7 @@ function prepareScreen(teamData) {
 
   bot.message((message) => {
     if (message.channel == currentChannel) {
-      logMessage(message, log, userList, channelList)
+      logMessage(message)
     }
   })
 
@@ -124,24 +124,24 @@ function prepareScreen(teamData) {
   })
 
   screen.on('resize', () => {
-    init(log, userList, channelList, currentChannel)
+    init(log, currentChannel)
   })
 
-  init(log, userList, channelList, currentChannel)
+  init(log, currentChannel)
 }
 
-function init(log, userList, channelList, currentChannel) {
+function init(log, currentChannel) {
   log.clearItems()
-  logHistory(log, userList, channelList, currentChannel)
+  logHistory(log, currentChannel)
 }
 
-function logHistory(log, userList, channelList, channel) {
-  let gen = historyGen(log, userList, channelList)
+function logHistory(log, channel) {
+  let gen = historyGen(log)
   gen.next()
-  getHistory(channel, log, gen)
+  getHistory(channel, gen)
 }
 
-function* historyGen(log, userList, channelList) {
+function* historyGen(log) {
   log.log('Fetching messages...')
   let history = yield
   log.clearItems()
@@ -155,7 +155,7 @@ function* historyGen(log, userList, channelList) {
   }
 }
 
-function getHistory(channel, log, gen) {
+function getHistory(channel, gen) {
   let api = ''
   switch(channel[0]) {
     case 'C':
