@@ -3,6 +3,7 @@ let contrib = require('blessed-contrib')
 let slackLog = require('./lib/widget/slackLog')
 let env = require('node-env-file')
 let slack = require('slack')
+slack.chat.command = require('./lib/chat.command')
 let _ = require('lodash')
 let {border, focusBorder} = require('jsonFile').readFileSync('./config.json')
 
@@ -24,15 +25,15 @@ let grid = new contrib.grid({
   rows: 12, cols: 12, screen: screen
 })
 
-screen.key(['C-t'], (ch, key) => {
-  if (tokens.length > 1) {
+if (tokens.length > 1) {
+  screen.key(['C-t'], (ch, key) => {
     token = tokens[(++t) % tokens.length]
     bot.listen({token})
     getTeamData(token, (teamData) => {
       prepareScreen(teamData)
     })
-  }
-})
+  })
+}
 
 getTeamData(token, (teamData) => {
   prepareScreen(teamData)
@@ -69,16 +70,31 @@ function prepareScreen(teamData) {
     var message = formatMessage(input.getValue(), userListInverted, channelListInverted, currentChannel)
     input.clearValue()
     screen.render()
-    slack.chat.postMessage({
-      token: token,
-      channel: currentChannel,
-      text: message,
-      as_user: true
-    }, (err, data) => {
-      if (err) {
-        console.log(err)
-      }
-    })
+    if (message[0] == "/") {
+      let commandReg = /^\/([^\s]*)/
+      let match = commandReg.exec(message)
+      let text = (_.replace(message, match[0], '')).trim()
+
+      slack.chat.command({
+        token: token,
+        channel: currentChannel,
+        text: text,
+        command: match[0]
+      }, (err, data) => {
+        if (err) console.log(err)
+      })
+    } else {
+      slack.chat.postMessage({
+        token: token,
+        channel: currentChannel,
+        text: message,
+        as_user: true
+      }, (err, data) => {
+        if (err) {
+          console.log(err)
+        }
+      })
+    }
   })
 
   let tree = grid.set(0, 0, 12, 4, contrib.tree, {
@@ -90,8 +106,8 @@ function prepareScreen(teamData) {
   tree.on('select', (node) => {
     if (node.children == undefined && node.id != currentChannel) {
       currentChannel = node.id
-      input.setLabel(`Message #${channelList[currentChannel]}`)
-      log.setLabel(`#${channelList[currentChannel]}`)
+      input.setLabel(`Message ${currentChannel[0] == 'C' ? '#' : '@'}${channelList[currentChannel]}`)
+      log.setLabel(`${currentChannel[0] == 'C' ? '#' : '@'}${channelList[currentChannel]}`)
       log.logLines = []
       log.clearItems()
       lastMessager = ''
