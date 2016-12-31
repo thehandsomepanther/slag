@@ -1,8 +1,8 @@
 let _ = require('lodash')
 
 module.exports = function formatMessage(text, userList, channelList, currentChannel) {
-  let userReg = /@([^\s]*)/g
-  let channelReg = /#([^\s]*)/g
+  let userReg = /@([a-z0-9]*)/g
+  let channelReg = /#([a-z0-9\-]*)/g
 
   let match
   while (match = userReg.exec(text)) {

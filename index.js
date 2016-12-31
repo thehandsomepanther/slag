@@ -90,9 +90,7 @@ function prepareScreen(teamData) {
         text: message,
         as_user: true
       }, (err, data) => {
-        if (err) {
-          console.log(err)
-        }
+        if (err) console.log(err)
       })
     }
   })
