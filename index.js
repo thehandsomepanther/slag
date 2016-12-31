@@ -3,14 +3,15 @@ let contrib = require('blessed-contrib')
 let slackLog = require('./lib/widget/slackLog')
 let env = require('node-env-file')
 let slack = require('slack')
-slack.chat.command = require('./lib/chat.command')
 let _ = require('lodash')
 let {border, focusBorder} = require('jsonFile').readFileSync('./config.json')
 
-let getTeamData = require('./util/getTeamData')
-let parseMessage = require('./util/parseMessage')
-let formatMessage = require('./util/formatMessage')
-let logHistory = require('./util/logHistory')
+let {
+  getTeamData,
+  sendMessage,
+  parseMessage,
+  formatMessage,
+  logHistory } = require('./util')
 
 env(__dirname + '/.env')
 
@@ -70,29 +71,7 @@ function prepareScreen(teamData) {
     var message = formatMessage(input.getValue(), userListInverted, channelListInverted, currentChannel)
     input.clearValue()
     screen.render()
-    if (message[0] == "/") {
-      let commandReg = /^\/([^\s]*)/
-      let match = commandReg.exec(message)
-      let text = (_.replace(message, match[0], '')).trim()
-
-      slack.chat.command({
-        token: token,
-        channel: currentChannel,
-        text: text,
-        command: match[0]
-      }, (err, data) => {
-        if (err) console.log(err)
-      })
-    } else {
-      slack.chat.postMessage({
-        token: token,
-        channel: currentChannel,
-        text: message,
-        as_user: true
-      }, (err, data) => {
-        if (err) console.log(err)
-      })
-    }
+    sendMessage(token, currentChannel, message)
   })
 
   let tree = grid.set(0, 0, 12, 4, contrib.tree, {
