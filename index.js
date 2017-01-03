@@ -87,7 +87,6 @@ function prepareScreen(teamData) {
       log.setLabel(`${currentChannel[0] == 'C' ? '#' : '@'}${channelList[currentChannel]}`)
       log.logLines = []
       log.clearItems()
-      lastMessager = ''
       logHistory(token, log, currentChannel)
     }
   })
@@ -103,8 +102,8 @@ function prepareScreen(teamData) {
   let foci = [tree, input]
   var currentFocus = 0
 
-  foci[0].focus()
-  foci[0].style.border = focusBorder
+  foci[currentFocus].focus()
+  foci[currentFocus].style.border = focusBorder
 
   screen.key(['tab'], (ch, key) => {
     foci[currentFocus].style.border = border
@@ -119,7 +118,7 @@ function prepareScreen(teamData) {
   })
 
   screen.on('resize', () => {
-    init(log, currentChannel)
+    init(token, log, currentChannel)
   })
 
   init(token, log, currentChannel)
