@@ -42,6 +42,7 @@ getTeamData(token, (teamData) => {
 
 function prepareScreen(teamData) {
   let {
+    currentUser,
     channelTree,
     channelList,
     currentChannel,
@@ -56,6 +57,7 @@ function prepareScreen(teamData) {
     label: `#${channelList[currentChannel]}`,
     tags: true,
     scrollable: true,
+    currentUser,
     channelList,
     userList
   })
@@ -114,7 +116,7 @@ function prepareScreen(teamData) {
   })
 
   screen.key(['escape', 'C-c'], (ch, key) => {
-    return process.exit(0);
+    return process.exit(0)
   })
 
   screen.on('resize', () => {

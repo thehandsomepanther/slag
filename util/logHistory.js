@@ -13,7 +13,7 @@ function* historyGen(log) {
   log.logLines = []
   if (Array.isArray(history)) {
     for (let message of history) {
-      log.logMessage(message)
+      log.logMessage(message, false)
     }
   } else {
     log.log(history)
