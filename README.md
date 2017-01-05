@@ -1,4 +1,16 @@
 # slack terminal client
+this is way to send and receive messages to your slack teams in the terminal. i started this project because i used to do all my work on a late 2008 macbook and being in five active slack teams at once meant using the slack desktop or web app was a no go. even on a computer that can handle slack, though, it's sometimes nice to be able to talk to people from the terminal.
+
+## what this client supports right now
+- chatting (public channels, private channels, DMs, etc)
+- slash-commands from slack's hidden api!!
+- @- and #-mentions
+
+## what this client doesn't support/has trouble supporting (as of right now)
+- images/gifs (for obvious reasons)
+- files and links (they get printed out, but if they're too long they can go off the screen)
+- emoji 😥
+
 to run:
 ```
 npm install
