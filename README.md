@@ -11,7 +11,7 @@ this is way to send and receive messages to your slack teams in the terminal. i 
 - files and links (they get printed out, but if they're too long they can go off the screen)
 - emoji 😥
 
-to run:
+## how to run:
 ```
 npm install
 node index.js
