@@ -1,22 +1,20 @@
 let blessed = require('blessed')
 let contrib = require('blessed-contrib')
 let slackLog = require('./lib/widget/slackLog')
-let env = require('node-env-file')
 let slack = require('slack')
 let _ = require('lodash')
 let {border, focusBorder} = require('jsonFile').readFileSync('./config.json')
 
 let {
+  getTokens,
   getTeamData,
   sendMessage,
   parseMessage,
   formatMessage,
   logHistory } = require('./util')
 
-env(__dirname + '/.env')
-
 let bot = slack.rtm.client()
-let tokens = process.env.SLACK_TOKENS.split(" ")
+let tokens = getTokens()
 let t = 0
 let token = tokens[t]
 bot.listen({token})

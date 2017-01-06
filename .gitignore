@@ -1,5 +1,6 @@
 .env
 .DS_Store
-npm-debug.log
+*.log
 node_modules
 test.js
+tokens.json

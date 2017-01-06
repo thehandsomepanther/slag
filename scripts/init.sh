@@ -10,7 +10,7 @@ VALID_NODE_VERSION="7.2.1"
 
 # Only execute start script if valid node version is found
 if [[ $(node --version | grep ${VERSIONS}) ]] ; then
-  echo "${GRN}Starting program..."
+  echo "${GRN}Starting program...${NC}"
   node index.js
 else
   echo "${RED}It appears that you don't have the appropriate node version to run this program${GRN}"
