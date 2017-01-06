@@ -2,6 +2,7 @@ let blessed = require('blessed')
 let contrib = require('blessed-contrib')
 let slackLog = require('./lib/widget/slackLog')
 let slack = require('slack')
+let timestamp = require('unix-timestamp')
 let _ = require('lodash')
 let {border, focusBorder} = require('jsonFile').readFileSync('./config.json')
 
@@ -11,6 +12,7 @@ let {
   sendMessage,
   parseMessage,
   formatMessage,
+  handleMessage,
   logHistory } = require('./util')
 
 let bot = slack.rtm.client()
@@ -25,12 +27,21 @@ let grid = new contrib.grid({
 })
 
 if (tokens.length > 1) {
-  screen.key(['C-t'], (ch, key) => {
-    token = tokens[(++t) % tokens.length]
-    bot.listen({token})
-    getTeamData(token, (teamData) => {
-      prepareScreen(teamData)
-    })
+  screen.key(['C-t'], onTeamChange)
+}
+
+function onTeamChange(ch, key) {
+  bot.close()
+  token = tokens[(++t) % tokens.length]
+  bot.listen({token})
+  screen.destroy()
+  screen = blessed.screen()
+  grid = new contrib.grid({
+    rows: 12, cols: 12, screen: screen
+  })
+  screen.key(['C-t'], onTeamChange)
+  getTeamData(token, (teamData) => {
+    prepareScreen(teamData)
   })
 }
 
@@ -93,9 +104,10 @@ function prepareScreen(teamData) {
 
   tree.setData(channelTree)
 
+  let now = parseFloat(timestamp.now())
   bot.message((message) => {
-    if (message.channel == currentChannel) {
-      log.logMessage(message)
+    if (parseFloat(message.ts) > now) {
+      handleMessage(message, log, userList, currentUser, channelList, currentChannel)
     }
   })
 
