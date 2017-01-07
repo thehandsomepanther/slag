@@ -12,7 +12,6 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.6.5",
-    "fs": "0.0.1-security",
     "jsonfile": "^2.4.0",
     "lodash": "^4.17.3",
     "node-notifier": "^4.6.1",
