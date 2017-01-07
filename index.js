@@ -14,6 +14,7 @@ let {
   sendMessage,
   formatMessage,
   handleMessage,
+  markRead,
   logHistory } = require('./util')
 
 let bot = slack.rtm.client()
@@ -96,6 +97,7 @@ function prepareScreen(teamData) {
       log.logLines = []
       log.clearItems()
       logHistory(teamData, log)
+      markRead(teamData.token, node.id, timestamp.now())
     }
   })
 

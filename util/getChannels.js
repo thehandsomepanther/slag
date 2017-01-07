@@ -38,14 +38,20 @@ module.exports = function getChannels(token, userList, cb) {
   slack.channels.list({token}, (err, data) => {
     var channels = data.channels
     for (let channel of channels) {
-      channelTree
-        .children[channel.is_member ? 'Your Channels' : 'Other Channels']
-        .children[channel.name] = {'id': channel.id}
-      channelList[channel.id] = channel.name
+      slack.channels.info({ token, channel: channel.id }, (err, data) => {
+        channel = data.channel
+        let belongsTo = channel.is_member ? 'Your Channels' : 'Other Channels'
 
-      if (channel.is_general) {
-        currentChannel = channel.id
-      }
+        channelTree
+          .children[belongsTo]
+          .children[channel.unread_count > 0 ? `${channel.name} *` : channel.name] = {'id': channel.id, 'unread_count': channel.unread_count}
+        
+        channelList[channel.id] = {name: channel.name, belongsTo: belongsTo}
+
+        if (channel.is_general) {
+          currentChannel = channel.id
+        }
+      })
     }
 
     slack.groups.list({token}, (err, data) => {

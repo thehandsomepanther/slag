@@ -8,7 +8,7 @@ module.exports = function handleMessage(teamData, message, log) {
       message.text.includes('!channel') ||
       message.text.includes('!here'))) {
     notifier.notify({
-      title: `#${channelList[message.channel]}`,
+      title: `#${channelList[message.channel].name}`,
       message: userList[message.user] + ": " + parseMessage(message.text, userList, channelList, false)
     })
   }
