@@ -63,7 +63,7 @@ function prepareScreen(teamData) {
   })
 
   let log = grid.set(0, 4, 11, 8, slackLog, {
-    label: `#${teamData.channelList[teamData.currentChannel]}`,
+    label: `#${teamData.channelList[teamData.currentChannel].name}`,
     tags: true,
     scrollable: true,
     teamData: teamData
@@ -72,7 +72,7 @@ function prepareScreen(teamData) {
 
   let input = grid.set(11, 4, 1.5, 8, blessed.textbox, {
     keys: true,
-    label: `Message #${teamData.channelList[teamData.currentChannel]}`,
+    label: `Message #${teamData.channelList[teamData.currentChannel].name}`,
   })
   input.style.border = border
 
@@ -92,8 +92,9 @@ function prepareScreen(teamData) {
   tree.on('select', (node) => {
     if (node.children == undefined && node.id != teamData.currentChannel) {
       teamData.currentChannel = node.id
-      input.setLabel(`Message ${teamData.currentChannel[0] == 'C' ? '#' : '@'}${teamData.channelList[teamData.currentChannel]}`)
-      log.setLabel(`${teamData.currentChannel[0] == 'C' ? '#' : '@'}${teamData.channelList[teamData.currentChannel]}`)
+      let channelObject = teamData.channelList[teamData.currentChannel]
+      input.setLabel(`Message ${teamData.currentChannel[0] == 'C' ? '#' : '@'}${channelObject.name}`)
+      log.setLabel(`${teamData.currentChannel[0] == 'C' ? '#' : '@'}${channelObject.name}`)
       log.logLines = []
       log.clearItems()
       logHistory(teamData, log)
