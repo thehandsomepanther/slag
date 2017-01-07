@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./scripts/init.sh"
+    "start": "./bin/init.sh"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.6.5",
+    "cluster": "0.7.7",
+    "cross-spawn": "5.0.1",
     "fs": "0.0.1-security",
     "lodash": "^4.17.3",
     "node-notifier": "^4.6.1",

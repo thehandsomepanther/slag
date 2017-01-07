@@ -45,6 +45,7 @@ function onTeamChange(i) {
   grid = new contrib.grid({
     rows: 12, cols: 12, screen: screen
   })
+
   assignScreenEvents()
   getTeamData(token, (teamData) => {
     prepareScreen(teamData)
@@ -71,6 +72,8 @@ function assignScreenEvents() {
   screen.key(['escape', 'C-c'], (ch, key) => {
     return process.exit(0)
   })
+  
+  run()
 }
 
 function prepareScreen(teamData) {
@@ -183,3 +186,11 @@ function makeTeamDisplayChildren(tokenList) {
   }
   return children
 }
+
+function run() {
+  getTeamData(token, (teamData) => {
+    prepareScreen(teamData)
+  })
+}
+
+module.exports = run
