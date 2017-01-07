@@ -33,6 +33,8 @@ let grid = new contrib.grid({
   rows: 12, cols: 12, screen: screen
 })
 
+run()
+
 function onTeamChange(i) {
   t = i
   bot.close()
@@ -47,14 +49,8 @@ function onTeamChange(i) {
   })
 
   assignScreenEvents()
-  getTeamData(token, (teamData) => {
-    prepareScreen(teamData)
-  })
+  run()
 }
-
-getTeamData(token, (teamData) => {
-  prepareScreen(teamData)
-})
 
 function assignScreenEvents() {
   if (tokenList.length > 1) {
@@ -72,7 +68,7 @@ function assignScreenEvents() {
   screen.key(['escape', 'C-c'], (ch, key) => {
     return process.exit(0)
   })
-  
+
   run()
 }
 
