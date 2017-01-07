@@ -21,7 +21,9 @@ let t = 0
 let token = tokens[t]
 bot.listen({token})
 
-let screen = blessed.screen()
+let screen = blessed.screen({
+  fullUnicode: true
+})
 let grid = new contrib.grid({
   rows: 12, cols: 12, screen: screen
 })
@@ -35,7 +37,9 @@ function onTeamChange(ch, key) {
   token = tokens[(++t) % tokens.length]
   bot.listen({token})
   screen.destroy()
-  screen = blessed.screen()
+  screen = blessed.screen({
+    fullUnicode: true
+  })
   grid = new contrib.grid({
     rows: 12, cols: 12, screen: screen
   })

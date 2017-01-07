@@ -3,8 +3,8 @@ let path = require('path')
 
 module.exports = function () {
   try {
-    const tokens = fs.readFileSync(path.join(__dirname, '../tokens.json'), { encoding: 'utf-8' });
-    return Object.values(JSON.parse(tokens));
+    const tokens = fs.readFileSync(path.join(__dirname, '../tokens.json'), { encoding: 'utf-8' })
+    return Object.values(JSON.parse(tokens))
 
   } catch(exception) {
 
