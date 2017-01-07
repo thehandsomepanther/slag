@@ -4,13 +4,14 @@ let slackLog = require('./lib/widget/slackLog')
 let slack = require('slack')
 let timestamp = require('unix-timestamp')
 let _ = require('lodash')
-let {border, focusBorder} = require('jsonFile').readFileSync('./config.json')
+let fs = require('fs')
+let path = require('path')
+let {border, focusBorder} = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), { encoding: 'utf-8' }))
 
 let {
   getTokens,
   getTeamData,
   sendMessage,
-  parseMessage,
   formatMessage,
   handleMessage,
   logHistory } = require('./util')
@@ -54,64 +55,56 @@ getTeamData(token, (teamData) => {
 })
 
 function prepareScreen(teamData) {
-  let {
-    currentUser,
-    channelTree,
-    channelList,
-    currentChannel,
-    userList,
-    currentTeam
-  } = teamData
-
-  let userListInverted = _.invert(userList)
-  let channelListInverted = _.invert(channelList)
+  _.extend(teamData, {
+    userListInverted: _.invert(teamData.userList),
+    channelListInverted: _.invert(teamData.channelList),
+    token: token
+  })
 
   let log = grid.set(0, 4, 11, 8, slackLog, {
-    label: `#${channelList[currentChannel]}`,
+    label: `#${teamData.channelList[teamData.currentChannel]}`,
     tags: true,
     scrollable: true,
-    currentUser,
-    channelList,
-    userList
+    teamData: teamData
   })
   log.style.border = border
 
   let input = grid.set(11, 4, 1.5, 8, blessed.textbox, {
     keys: true,
-    label: `Message #${channelList[currentChannel]}`,
+    label: `Message #${teamData.channelList[teamData.currentChannel]}`,
   })
   input.style.border = border
 
   input.on('submit', (data) => {
-    var message = formatMessage(input.getValue(), userListInverted, channelListInverted, currentChannel)
+    var message = formatMessage(teamData, input.getValue())
     input.clearValue()
     screen.render()
-    sendMessage(token, currentChannel, message)
+    sendMessage(teamData, message)
   })
 
   let tree = grid.set(0, 0, 12, 4, contrib.tree, {
-    label: `${currentTeam}`,
+    label: `${teamData.currentTeam}`,
     tags: true,
   })
   tree.style.border = border
 
   tree.on('select', (node) => {
-    if (node.children == undefined && node.id != currentChannel) {
-      currentChannel = node.id
-      input.setLabel(`Message ${currentChannel[0] == 'C' ? '#' : '@'}${channelList[currentChannel]}`)
-      log.setLabel(`${currentChannel[0] == 'C' ? '#' : '@'}${channelList[currentChannel]}`)
+    if (node.children == undefined && node.id != teamData.currentChannel) {
+      teamData.currentChannel = node.id
+      input.setLabel(`Message ${teamData.currentChannel[0] == 'C' ? '#' : '@'}${teamData.channelList[teamData.currentChannel]}`)
+      log.setLabel(`${teamData.currentChannel[0] == 'C' ? '#' : '@'}${teamData.channelList[teamData.currentChannel]}`)
       log.logLines = []
       log.clearItems()
-      logHistory(token, log, currentChannel)
+      logHistory(teamData, log)
     }
   })
 
-  tree.setData(channelTree)
+  tree.setData(teamData.channelTree)
 
   let now = parseFloat(timestamp.now())
   bot.message((message) => {
     if (parseFloat(message.ts) > now) {
-      handleMessage(message, log, userList, currentUser, channelList, currentChannel)
+      handleMessage(teamData, message, log)
     }
   })
 
@@ -134,13 +127,13 @@ function prepareScreen(teamData) {
   })
 
   screen.on('resize', () => {
-    init(token, log, currentChannel)
+    init(teamData, log)
   })
 
-  init(token, log, currentChannel)
+  init(teamData, log)
 }
 
-function init(token, log, currentChannel) {
+function init(teamData, log) {
   log.clearItems()
-  logHistory(token, log, currentChannel)
+  logHistory(teamData, log)
 }
