@@ -1,7 +1,8 @@
 let notifier = require('node-notifier')
 let parseMessage = require('./parseMessage')
 
-module.exports = function handleMessage(message, log, userList, currentUser, channelList, currentChannel) {
+module.exports = function handleMessage(teamData, message, log) {
+  let {userList, currentUser, channelList, currentChannel} = teamData
   if (message.text != undefined && (
       message.text.includes(currentUser) ||
       message.text.includes('!channel') ||

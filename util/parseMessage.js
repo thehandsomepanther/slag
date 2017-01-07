@@ -3,7 +3,8 @@ let fs = require('fs')
 let path = require('path')
 const emoji = JSON.parse(fs.readFileSync(path.join(__dirname, '../emoji/emoji.json'), { encoding: 'utf-8' }))
 
-module.exports = function parseMessage(text, userList, channelList, format=true) {
+module.exports = function parseMessage(teamData, text, format=true) {
+  let {userList, channelList} = teamData
   let userReg = /<@([^>\|]*)\|?([^>]*)>/g
   let channelReg = /<#([^>\|]*)\|?@?([^>]*)>/g
   let groupReg = /<!([^>\|]*)\|?@?([^>]*)>/g

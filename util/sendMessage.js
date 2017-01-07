@@ -2,7 +2,8 @@ let slack = require('slack')
 slack.chat.command = require('../lib/chat.command')
 let _ = require('lodash')
 
-module.exports = function sendMessage(token, channel, message) {
+module.exports = function sendMessage(teamData, message) {
+  let {token, currentChannel} = teamData
   if (!message.length) return
 
   if (message[0] == "/") {
@@ -12,7 +13,7 @@ module.exports = function sendMessage(token, channel, message) {
 
     slack.chat.command({
       token: token,
-      channel: channel,
+      channel: currentChannel,
       text: text,
       command: match[0]
     }, (err, data) => {
@@ -21,7 +22,7 @@ module.exports = function sendMessage(token, channel, message) {
   } else {
     slack.chat.postMessage({
       token: token,
-      channel: channel,
+      channel: currentChannel,
       text: message,
       as_user: true
     }, (err, data) => {

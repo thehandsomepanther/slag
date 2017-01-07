@@ -1,9 +1,10 @@
 let slack = require('slack')
 
-module.exports = function logHistory(token, log, channel) {
+module.exports = function logHistory(teamData, log) {
+  let {token, currentChannel} = teamData
   let gen = historyGen(log)
   gen.next()
-  getHistory(token, channel, gen)
+  getHistory(token, currentChannel, gen)
 }
 
 function* historyGen(log) {
