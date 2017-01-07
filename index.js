@@ -46,14 +46,8 @@ function onTeamChange(ch, key) {
     rows: 12, cols: 12, screen: screen
   })
   screen.key(['C-t'], onTeamChange)
-  getTeamData(token, (teamData) => {
-    prepareScreen(teamData)
-  })
+  run()
 }
-
-getTeamData(token, (teamData) => {
-  prepareScreen(teamData)
-})
 
 function prepareScreen(teamData) {
   _.extend(teamData, {
@@ -140,3 +134,11 @@ function init(teamData, log) {
   log.clearItems()
   logHistory(teamData, log)
 }
+
+function run() {
+  getTeamData(token, (teamData) => {
+    prepareScreen(teamData)
+  })
+}
+
+module.exports = run
