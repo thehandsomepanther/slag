@@ -13,6 +13,7 @@ let {
   parseMessage,
   formatMessage,
   handleMessage,
+  markRead,
   logHistory } = require('./util')
 
 let bot = slack.rtm.client()
@@ -56,14 +57,14 @@ function prepareScreen(teamData) {
     channelList,
     currentChannel,
     userList,
-    currentTeam
+    currentTeam,
   } = teamData
 
   let userListInverted = _.invert(userList)
   let channelListInverted = _.invert(channelList)
 
   let log = grid.set(0, 4, 11, 8, slackLog, {
-    label: `#${channelList[currentChannel]}`,
+    label: `#${channelList[currentChannel].name}`,
     tags: true,
     scrollable: true,
     currentUser,
@@ -74,7 +75,7 @@ function prepareScreen(teamData) {
 
   let input = grid.set(11, 4, 1.5, 8, blessed.textbox, {
     keys: true,
-    label: `Message #${channelList[currentChannel]}`,
+    label: `Message #${channelList[currentChannel].name}`,
   })
   input.style.border = border
 
@@ -94,11 +95,17 @@ function prepareScreen(teamData) {
   tree.on('select', (node) => {
     if (node.children == undefined && node.id != currentChannel) {
       currentChannel = node.id
-      input.setLabel(`Message ${currentChannel[0] == 'C' ? '#' : '@'}${channelList[currentChannel]}`)
-      log.setLabel(`${currentChannel[0] == 'C' ? '#' : '@'}${channelList[currentChannel]}`)
+      let channelObject = channelList[currentChannel]
+
+      input.setLabel(`Message ${currentChannel[0] == 'C' ? '#' : '@'}${channelObject.name}`)
+      log.setLabel(`${currentChannel[0] == 'C' ? '#' : '@'}${channelObject.name}`)
       log.logLines = []
       log.clearItems()
       logHistory(token, log, currentChannel)
+      markRead(token, node.id, timestamp.now())
+      
+      // TODO Re-render channel tree 
+        
     }
   })
 
