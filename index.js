@@ -92,8 +92,9 @@ function prepareScreen(teamData) {
   tree.on('select', (node) => {
     if (node.children == undefined && node.id != teamData.currentChannel) {
       teamData.currentChannel = node.id
-      input.setLabel(`Message ${teamData.currentChannel[0] == 'C' ? '#' : '@'}${teamData.channelList[teamData.currentChannel]}`)
-      log.setLabel(`${teamData.currentChannel[0] == 'C' ? '#' : '@'}${teamData.channelList[teamData.currentChannel]}`)
+      let channelObject = teamData.channelList[teamData.currentChannel]
+      input.setLabel(`Message ${teamData.currentChannel[0] == 'C' ? '#' : '@'}${channelObject.name}`)
+      log.setLabel(`${teamData.currentChannel[0] == 'C' ? '#' : '@'}${channelObject.name}`)
       log.logLines = []
       log.clearItems()
       logHistory(teamData, log)
