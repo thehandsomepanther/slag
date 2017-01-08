@@ -1,4 +1,5 @@
 let slack = require('slack')
+let errors = require('../errors')
 
 module.exports = function getUsers(token, cb) {
   var token = token
@@ -6,8 +7,7 @@ module.exports = function getUsers(token, cb) {
 
   slack.auth.test({token}, (err, data) => {
     if (err) {
-      console.log("There's something wrong with your token. Get a new token and try again.")
-      return process.exit(1)
+      throw new errors.ExternalResourceError("Can't retrieve your identity from Slack")
     }
 
     cb(data.user_id)
