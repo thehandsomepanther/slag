@@ -1,4 +1,4 @@
-let run = require('../index')
+let init = require('../index')
 
 process.on('uncaughtException', function (err) {
   console.error(`[${(new Date).toUTCString()}] ${err.name}: ${err.message}\n`)
@@ -11,4 +11,4 @@ process.on('exit', function (code) {
   process.exit(code)
 })
 
-run()
+init()

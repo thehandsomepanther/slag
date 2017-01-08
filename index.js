@@ -17,36 +17,30 @@ let {
   markRead,
   logHistory } = require('./util')
 
-let bot = slack.rtm.client()
-let tokens = getTokens()
-let t = 0
-let token = tokens[t]
-bot.listen({token})
+function onTeamChange(i) {
+  t = i
+  bot.close()
+  screen.destroy()
 
-let screen = blessed.screen({
-  fullUnicode: true
-})
-let grid = new contrib.grid({
-  rows: 12, cols: 12, screen: screen
-})
-
-if (tokens.length > 1) {
-  screen.key(['C-t'], onTeamChange)
+  run()
 }
 
-function onTeamChange(ch, key) {
-  bot.close()
-  token = tokens[(++t) % tokens.length]
-  bot.listen({token})
-  screen.destroy()
-  screen = blessed.screen({
-    fullUnicode: true
+function assignScreenEvents() {
+  if (tokenList.length > 1) {
+    screen.key(['C-t'], (ch, key) => {
+      onTeamChange(++t)
+    })
+  }
+
+  for (let i = 0; i < Math.min(teamSwitchKeys.length, tokenList.length); i++) {
+    screen.key([`C-${teamSwitchKeys[i]}`], (ch, key) => {
+      onTeamChange(teamSwitchKeys.indexOf(key.name))
+    })
+  }
+
+  screen.key(['escape', 'C-c'], (ch, key) => {
+    return process.exit(0)
   })
-  grid = new contrib.grid({
-    rows: 12, cols: 12, screen: screen
-  })
-  screen.key(['C-t'], onTeamChange)
-  run()
 }
 
 function prepareScreen(teamData) {
@@ -77,9 +71,12 @@ function prepareScreen(teamData) {
     sendMessage(teamData, message)
   })
 
-  let tree = grid.set(0, 0, 12, 4, contrib.tree, {
+  let tree = grid.set(0, 0, 9, 4, contrib.tree, {
     label: `${teamData.currentTeam}`,
     tags: true,
+    template: {
+      lines: true
+    }
   })
   tree.style.border = border
 
@@ -98,6 +95,23 @@ function prepareScreen(teamData) {
 
   tree.setData(teamData.channelTree)
 
+  let teamDisplay = grid.set(9, 0, 3, 4, contrib.tree, {
+    label: `Your Teams`,
+    tags: true,
+    template: {
+      lines: true
+    }
+  })
+  teamDisplay.setData({
+    extended: true,
+    children: makeTeamDisplayChildren(tokenList)
+  })
+  teamDisplay.style.border = border
+
+  teamDisplay.on('select', (node) => {
+    onTeamChange(node.index)
+  })
+
   let now = parseFloat(timestamp.now())
   bot.message((message) => {
     if (parseFloat(message.ts) > now) {
@@ -105,7 +119,7 @@ function prepareScreen(teamData) {
     }
   })
 
-  let foci = [tree, input]
+  let foci = [tree, input, teamDisplay]
   var currentFocus = 0
 
   foci[currentFocus].focus()
@@ -119,26 +133,52 @@ function prepareScreen(teamData) {
     screen.render()
   })
 
-  screen.key(['escape', 'C-c'], (ch, key) => {
-    return process.exit(0)
-  })
-
   screen.on('resize', () => {
-    init(teamData, log)
+    initScreen(teamData, log)
   })
 
-  init(teamData, log)
+  initScreen(teamData, log)
 }
 
-function init(teamData, log) {
+function initScreen(teamData, log) {
   log.clearItems()
   logHistory(teamData, log)
 }
 
+function makeTeamDisplayChildren(tokenList) {
+  let children = {}
+  for (let i = 0; i < tokenList.length; i++) {
+    let item = tokenList[i]
+    children[`${item.team} {red-fg}(⌃${teamSwitchKeys[i]}){/red-fg}`] = _.extend(item, {index: i})
+  }
+  return children
+}
+
 function run() {
+  token = tokenList[t % tokenList.length].token
+  bot.listen({token})
+
+  screen = blessed.screen({
+    fullUnicode: true
+  })
+  assignScreenEvents()
+
+  grid = new contrib.grid({
+    rows: 12, cols: 12, screen: screen
+  })
+
   getTeamData(token, (teamData) => {
     prepareScreen(teamData)
   })
 }
 
-module.exports = run
+function init() {
+  bot = slack.rtm.client()
+  tokenList = getTokens()
+  t = 0
+  teamSwitchKeys = 'asdfghjkl'
+
+  run()
+}
+
+module.exports = init

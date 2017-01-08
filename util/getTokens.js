@@ -2,10 +2,10 @@ let fs = require('fs')
 let path = require('path')
 let errors = require('../errors')
 
-module.exports = function () {
+module.exports = function getTokens() {
   try {
     const tokens = fs.readFileSync(path.join(__dirname, '../tokens.json'), { encoding: 'utf-8' })
-    return Object.values(JSON.parse(tokens))
+    return JSON.parse(tokens)
 
   } catch(exception) {
 
