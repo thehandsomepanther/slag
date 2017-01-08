@@ -149,7 +149,7 @@ function makeTeamDisplayChildren(tokenList) {
   let children = {}
   for (let i = 0; i < tokenList.length; i++) {
     let item = tokenList[i]
-    children[`${item.team} {red-fg}(⌃${teamSwitchKeys[i]}){/red-fg}`] = _.extend(item, {index: i})
+    children[`${item.team} (⌃${teamSwitchKeys[i]})`] = _.extend(item, {index: i})
   }
   return children
 }
