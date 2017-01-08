@@ -1,10 +1,10 @@
 let fs = require('fs')
 let path = require('path')
 
-module.exports = function () {
+module.exports = function getTokens() {
   try {
     const tokens = fs.readFileSync(path.join(__dirname, '../tokens.json'), { encoding: 'utf-8' })
-    return Object.values(JSON.parse(tokens))
+    return JSON.parse(tokens)
 
   } catch(exception) {
 
@@ -14,6 +14,5 @@ module.exports = function () {
       console.error('There\'s something wrong with your tokens.json configuration file\nMake sure it\'s in the format specified here: https://github.com/thehandsomepanther/slag/blob/master/README.md')
     }
     process.exit()
-
   }
 }
