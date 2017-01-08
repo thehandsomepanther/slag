@@ -75,7 +75,7 @@ module.exports = function getChannels(token, userList, cb) {
 
         channelTree
           .children['Group Messages'].children[group.name] = {'id': group.id}
-        channelList[group.id] = { name: group.name, belongsTo: 'Group Messages'}
+        channelList[group.id] = {name: group.name, belongsTo: 'Group Messages'}
       }
 
       slack.im.list({token}, (err, data) => {
@@ -83,7 +83,7 @@ module.exports = function getChannels(token, userList, cb) {
         for (let im of ims) {
           channelTree
             .children['Direct Messages'].children[userList[im.user]] = {'id': im.id}
-          channelList[im.id] = { name: userList[im.user], belongsTo: 'Direct Messages' }
+          channelList[im.id] = {name: userList[im.user], belongsTo: 'Direct Messages'}
         }
 
         cb([channelTree, channelList, currentChannel])
