@@ -17,38 +17,11 @@ let {
   markRead,
   logHistory } = require('./util')
 
-let bot = slack.rtm.client()
-let tokenList = getTokens()
-let t = 0
-let token = tokenList[t].token
-let teamSwitchKeys = 'asdfghjkl'
-bot.listen({token})
-
-let screen = blessed.screen({
-  fullUnicode: true
-})
-assignScreenEvents()
-
-let grid = new contrib.grid({
-  rows: 12, cols: 12, screen: screen
-})
-
-run()
-
 function onTeamChange(i) {
   t = i
   bot.close()
-  token = tokenList[i % tokenList.length].token
-  bot.listen({token})
   screen.destroy()
-  screen = blessed.screen({
-    fullUnicode: true
-  })
-  grid = new contrib.grid({
-    rows: 12, cols: 12, screen: screen
-  })
 
-  assignScreenEvents()
   run()
 }
 
@@ -68,8 +41,6 @@ function assignScreenEvents() {
   screen.key(['escape', 'C-c'], (ch, key) => {
     return process.exit(0)
   })
-
-  run()
 }
 
 function prepareScreen(teamData) {
@@ -163,13 +134,13 @@ function prepareScreen(teamData) {
   })
 
   screen.on('resize', () => {
-    init(teamData, log)
+    initScreen(teamData, log)
   })
 
-  init(teamData, log)
+  initScreen(teamData, log)
 }
 
-function init(teamData, log) {
+function initScreen(teamData, log) {
   log.clearItems()
   logHistory(teamData, log)
 }
@@ -184,9 +155,30 @@ function makeTeamDisplayChildren(tokenList) {
 }
 
 function run() {
+  token = tokenList[t % tokenList.length].token
+  bot.listen({token})
+
+  screen = blessed.screen({
+    fullUnicode: true
+  })
+  assignScreenEvents()
+
+  grid = new contrib.grid({
+    rows: 12, cols: 12, screen: screen
+  })
+
   getTeamData(token, (teamData) => {
     prepareScreen(teamData)
   })
 }
 
-module.exports = run
+function init() {
+  bot = slack.rtm.client()
+  tokenList = getTokens()
+  t = 0
+  teamSwitchKeys = 'asdfghjkl'
+
+  run()
+}
+
+module.exports = init

@@ -8,7 +8,7 @@ module.exports = function formatMessage(teamData, text) {
 
   let match
   while (match = userReg.exec(text)) {
-    if (userList[match[1]] != undefined) {
+    if (userListInverted[match[1]] != undefined) {
       text = _.replace(text, match[0], `<@${userListInverted[match[1]]}>`)
     }
 
@@ -17,7 +17,7 @@ module.exports = function formatMessage(teamData, text) {
     }
   }
   while (match = channelReg.exec(text)) {
-    if (channelList[match[1]] != undefined) {
+    if (channelListInverted[match[1]] != undefined) {
       text = _.replace(text, match[0], `<#${channelListInverted[match[1]]}>`)
     }
   }
