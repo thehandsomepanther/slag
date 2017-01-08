@@ -1,11 +1,12 @@
 let slack = require('slack')
+let errors = require('../errors')
 
 module.exports = function markRead(token, channelId, timestamp) {
   var token = token
 
   slack.channels.mark({token: token, channel: channelId, ts: timestamp}, (err, data) => {
     if (err) {
-      console.log("There's something wrong with your token. Get a new token and try again.")
+      throw new errors.ExternalResourceError("Unable to mark channel as read. Check if you have a valid Slack token")
       return process.exit(1)
     }
   })

@@ -1,7 +1,7 @@
 let run = require('../index')
 
 process.on('uncaughtException', function (err) {
-  console.error(`[${(new Date).toUTCString()}] Uncaught Exception: ${err.message}`)
+  console.error(`[${(new Date).toUTCString()}] ${err.name}: ${err.message}\n`)
   console.error(err.stack)
   process.exit(1)
 })

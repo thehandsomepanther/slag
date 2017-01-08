@@ -1,5 +1,6 @@
 let slack = require('slack')
 let _ = require('lodash')
+let errors = require('../errors')
 
 module.exports = function getChannels(token, userList, cb) {
   var token = token
@@ -36,6 +37,10 @@ module.exports = function getChannels(token, userList, cb) {
   }
 
   slack.channels.list({token}, (err, data) => {
+    if (err) {
+      throw new errors.ExternalResourceError('Unable to retrieve your channels from Slack')
+    }
+
     var channels = data.channels
     for (let channel of channels) {
       slack.channels.info({ token, channel: channel.id }, (err, data) => {
