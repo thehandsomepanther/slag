@@ -157,13 +157,6 @@ function makeTeamDisplayChildren(tokenList) {
 }
 
 function setData(tree, channelTree) {
-  let channels = Object.assign({}, channelTree.children['Your Channels'].children)
-  channels = sortObjectKeysBy(channels, (o) => {
-    return parseFloat(o.last_read)
-  })
-
-  channelTree.children['Your Channels'].children = channels
-
   tree.setData(channelTree)
 }
 
