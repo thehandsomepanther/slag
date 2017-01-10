@@ -49,7 +49,7 @@ module.exports = function getChannels(token, userList, cb) {
 
         channelTree
           .children[belongsTo]
-          .children[channel.unread_count > 0 ? `${channel.name} *` : channel.name] = { 'id': channel.id, 'unread_count': channel.unread_count }
+          .children[channel.unread_count > 0 ? `${channel.name} *` : channel.name] = { id: channel.id, unread_count: channel.unread_count, last_read: channel.last_read }
         
         channelList[channel.id] = {name: channel.name, belongsTo: belongsTo}
 
@@ -74,7 +74,7 @@ module.exports = function getChannels(token, userList, cb) {
         }
 
         channelTree
-          .children['Group Messages'].children[group.name] = {'id': group.id}
+          .children['Group Messages'].children[group.name] = {id: group.id}
         channelList[group.id] = {name: group.name, belongsTo: 'Group Messages'}
       }
 
@@ -82,7 +82,7 @@ module.exports = function getChannels(token, userList, cb) {
         var ims = data.ims
         for (let im of ims) {
           channelTree
-            .children['Direct Messages'].children[userList[im.user]] = {'id': im.id}
+            .children['Direct Messages'].children[userList[im.user]] = {id: im.id}
           channelList[im.id] = {name: userList[im.user], belongsTo: 'Direct Messages'}
         }
 

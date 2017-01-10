@@ -1,7 +1,7 @@
 let slack = require('slack')
 let errors = require('../errors')
 
-module.exports = function markRead(token, channelId, timestamp) {
+module.exports = function markRead(token, channelId, timestamp, cb) {
   var token = token
 
   switch(channelId[0]) {
@@ -32,4 +32,6 @@ module.exports = function markRead(token, channelId, timestamp) {
     default:
       break
   }
+
+  cb()
 }
