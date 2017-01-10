@@ -3,7 +3,8 @@ let parseMessage = require('./parseMessage')
 
 module.exports = function handleMessage(teamData, message, log) {
   let {userList, currentUser, channelList, currentChannel} = teamData
-  if (message.text != undefined && (
+  if (message.text != undefined &&
+      message.user != currentUser && (
       message.text.includes(currentUser) ||
       message.text.includes('!channel') ||
       message.text.includes('!here'))) {
