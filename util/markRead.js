@@ -6,12 +6,16 @@ module.exports = function markRead(token, channelId, timestamp) {
 
   switch(channelId[0]) {
     case 'C':
-      slack.channels.mark({token: token, channel: channelId, ts: timestamp}, (err, data) => {
-        if (err) {
+      try {
+        slack.channels.mark({token: token, channel: channelId, ts: timestamp}, (err, data) => {
+
+        })
+      } catch (e) {
+        if (e.error != "not_in_channel") {
           throw new errors.ExternalResourceError("Unable to mark channel as read. Check if you have a valid Slack token")
           return process.exit(1)
         }
-      })
+      }
       break
     case 'G':
       slack.groups.mark({token: token, channel: channelId, ts: timestamp}, (err, data) => {
