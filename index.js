@@ -71,7 +71,7 @@ function prepareScreen(teamData) {
     sendMessage(teamData, message)
   })
 
-  let tree = grid.set(0, 0, 9, 4, contrib.tree, {
+  let tree = grid.set(0, 0, 8.5, 4, contrib.tree, {
     label: `${teamData.currentTeam}`,
     tags: true,
     template: {
@@ -95,7 +95,7 @@ function prepareScreen(teamData) {
 
   tree.setData(teamData.channelTree)
 
-  let teamDisplay = grid.set(9, 0, 3, 4, contrib.tree, {
+  let teamDisplay = grid.set(8.5, 0, 4, 4, contrib.tree, {
     label: `Your Teams`,
     tags: true,
     template: {
