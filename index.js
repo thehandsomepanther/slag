@@ -187,15 +187,4 @@ function init() {
   run()
 }
 
-function sortObjectKeysBy (obj, comparator) {
-  let keys = _.sortBy(_.keys(obj), (key) => {
-      return comparator ? comparator(obj[key], key) : key
-  })
-
-  return _.zipObject(keys, _.map(keys, (key) => {
-      return obj[key]
-  }))
-}
-
-
 module.exports = init

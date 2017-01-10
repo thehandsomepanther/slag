@@ -7,6 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "./bin/init.sh"
   },
+  "preferGlobal" : true,
+  "bin" : {
+    "slag": "./bin/init.sh"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
