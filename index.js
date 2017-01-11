@@ -39,6 +39,8 @@ function assignScreenEvents() {
   }
 
   screen.key(['escape', 'C-c'], (ch, key) => {
+    bot.close()
+    screen.destroy()
     return process.exit(0)
   })
 }
