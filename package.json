@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "blessed": "^0.1.81",
-    "blessed-contrib": "https://github.com/thehandsomepanther/blessed-contrib",
+    "blessed-contrib": "4.7.5",
     "lodash": "^4.17.3",
     "node-notifier": "^4.6.1",
     "path": "0.12.7",

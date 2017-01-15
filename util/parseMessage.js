@@ -8,7 +8,7 @@ module.exports = function parseMessage(teamData, text, format=true) {
   let userReg = /<@([^>\|]*)\|?([^>]*)>/g
   let channelReg = /<#([^>\|]*)\|?@?([^>]*)>/g
   let groupReg = /<!([^>\|]*)\|?@?([^>]*)>/g
-  let emojiReg = /:[^\s]*:/g
+  let emojiReg = /:[a-z-]*:/g
   let color = ''
   if (format) {
     color = 'red-fg'
@@ -29,9 +29,9 @@ module.exports = function parseMessage(teamData, text, format=true) {
     if (emoji[match[0]] != undefined) {
       if (emoji[match[0]].length > 4) {
         let pair = findSurrogatePair(parseInt("0x"+emoji[match[0]]))
-        text = _.replace(text, match[0], String.fromCharCode(parseInt(pair[0]), parseInt(pair[1])))
+        text = _.replace(text, new RegExp(match[0], 'g'), String.fromCharCode(parseInt(pair[0]), parseInt(pair[1]))  + " ")
       } else {
-        text = _.replace(text, match[0], String.fromCharCode(parseInt(emoji[match[0]], 16)))
+        text = _.replace(text, new RegExp(match[0], 'g'), String.fromCharCode(parseInt(emoji[match[0]], 16) + " "))
       }
     }
   }
