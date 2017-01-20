@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 let init = require('../index')
 
 process.on('uncaughtException', function (err) {
