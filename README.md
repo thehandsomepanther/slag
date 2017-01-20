@@ -12,9 +12,10 @@ this is way to send and receive messages to your slack teams in the terminal. i 
 - files and links (they get printed out, but if they're too long they can go off the screen)
 
 ## how to run:
+clone this repo, then from inside the project directory run
 ```
 npm install
-npm start
+slag
 ```
 
 you'll also need a `tokens.json` file in the root directory of this project containing all your slack tokens (you can get yours [here](https://api.slack.com/docs/oauth-test-tokens)), like so:
