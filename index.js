@@ -94,8 +94,9 @@ function prepareScreen(teamData) {
       log.logLines = []
       log.clearItems()
       logHistory(teamData, log)
-      teamData.channelTree = markRead(teamData, node.id, timestamp.now())
+      markRead(teamData, node.id, timestamp.now())
       tree.setData(teamData.channelTree)
+      screen.render()
     }
   })
 
@@ -124,6 +125,7 @@ function prepareScreen(teamData) {
   bot.message((message) => {
     if (parseFloat(message.ts) > now) {
       handleMessage(teamData, message, log)
+      tree.setData(teamData.channelTree)
     }
   })
 

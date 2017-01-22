@@ -43,6 +43,4 @@ function markChannelTreeRead(channelTree, channelList, id) {
       break
     }
   }
-
-  return channelTree
 }
