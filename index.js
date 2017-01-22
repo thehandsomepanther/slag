@@ -57,7 +57,7 @@ function prepareScreen(teamData) {
     tags: true,
     scrollable: true,
     teamData: teamData,
-    mouse: true,
+    mouse: true
   })
   log.style.border = border
 
@@ -79,7 +79,9 @@ function prepareScreen(teamData) {
     tags: true,
     template: {
       lines: true
-    }
+    },
+    mouse: true,
+    interactive: true
   })
   tree.style.border = border
 
@@ -92,7 +94,8 @@ function prepareScreen(teamData) {
       log.logLines = []
       log.clearItems()
       logHistory(teamData, log)
-      markRead(teamData.token, node.id, timestamp.now())
+      teamData.channelTree = markRead(teamData, node.id, timestamp.now())
+      tree.setData(teamData.channelTree)
     }
   })
 
@@ -103,7 +106,9 @@ function prepareScreen(teamData) {
     tags: true,
     template: {
       lines: true
-    }
+    },
+    mouse: true,
+    interactive: true
   })
   teamDisplay.setData({
     extended: true,
@@ -163,7 +168,6 @@ function run() {
 
   screen = blessed.screen({
     fullUnicode: true,
-    smartCSR: true,
     scrollable: true
   })
   assignScreenEvents()

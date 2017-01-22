@@ -49,8 +49,13 @@ module.exports = function getChannels(token, userList, cb) {
 
         channelTree
           .children[belongsTo]
-          .children[channel.unread_count > 0 ? `${channel.name} *` : channel.name] = { 'id': channel.id, 'unread_count': channel.unread_count }
-        
+          .children[channel.name] =
+            {
+              'name': channel.unread_count > 0 ? `${channel.name} *` : channel.name,
+              'id': channel.id,
+              'unread_count': channel.unread_count
+            }
+
         channelList[channel.id] = {name: channel.name, belongsTo: belongsTo}
 
         if (channel.is_general) {
