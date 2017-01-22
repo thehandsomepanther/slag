@@ -144,15 +144,18 @@ function prepareScreen(teamData) {
   })
 
   screen.on('resize', () => {
-    initScreen(teamData, log)
+    initScreen(teamData, log, tree)
   })
 
-  initScreen(teamData, log)
+  initScreen(teamData, log, tree)
 }
 
-function initScreen(teamData, log) {
+function initScreen(teamData, log, tree) {
   log.clearItems()
   logHistory(teamData, log)
+  markRead(teamData, teamData.currentChannel, timestamp.now())
+  tree.setData(teamData.channelTree)
+  screen.render()
 }
 
 function makeTeamDisplayChildren(tokenList) {
