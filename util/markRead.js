@@ -36,9 +36,10 @@ module.exports = function markRead(teamData, channelId, timestamp) {
 }
 
 function markChannelTreeRead(channelTree, channelList, id) {
-  for (let child in channelTree.children['Your Channels'].children) {
+  let belongsTo = channelList[id].belongsTo
+  for (let child in channelTree.children[belongsTo].children) {
     if (child == channelList[id].name) {
-      channelTree.children['Your Channels'].children[child].name = channelList[id].name
+      channelTree.children[belongsTo].children[child].name = channelList[id].name
       break
     }
   }
