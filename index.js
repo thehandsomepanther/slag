@@ -56,7 +56,8 @@ function prepareScreen(teamData) {
     label: `#${teamData.channelList[teamData.currentChannel].name}`,
     tags: true,
     scrollable: true,
-    teamData: teamData
+    teamData: teamData,
+    mouse: true,
   })
   log.style.border = border
 
@@ -161,7 +162,9 @@ function run() {
   bot.listen({token})
 
   screen = blessed.screen({
-    fullUnicode: true
+    fullUnicode: true,
+    smartCSR: true,
+    scrollable: true
   })
   assignScreenEvents()
 
