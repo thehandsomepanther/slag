@@ -7,9 +7,9 @@ module.exports = function handleMessage(teamData, message, log) {
       message.user != currentUser && (
       message.text.includes(currentUser) ||
       message.text.includes('!channel') ||
-      message.text.includes('!here')) ||
+      message.text.includes('!here') ||
       message.channel[0] == 'D' ||
-      message.channel[0] == 'G') {
+      message.channel[0] == 'G')) {
     notifier.notify({
       title: `#${channelList[message.channel].name}`,
       message: userList[message.user] + ": " + parseMessage(teamData, message.text, false)
