@@ -67,20 +67,28 @@ module.exports = function getChannels(token, userList, cb) {
     slack.groups.list({token}, (err, data) => {
       var groups = data.groups
       for (let group of groups) {
-        if (group.name.substring(0, 4) == "mpdm") {
-          let name = _.replace(group.name, 'mpdm', '')
-          let groupReg = /(-([^-]*)-)/g
-          let match
-          while (match = groupReg.exec(name)) {
-            name = _.replace(name, match[0], `${match[2]}, `)
+        slack.groups.info({token, channel: group.id}, (err, data) => {
+          group = data.group
+          let belongsTo = 'Group Messages'
+          if (group.name.substring(0, 4) == "mpdm") {
+            let name = _.replace(group.name, 'mpdm', '')
+            let groupReg = /(-([^-]*)-)/g
+            let match
+            while (match = groupReg.exec(name)) {
+              name = _.replace(name, match[0], `${match[2]}, `)
+            }
+
+            group.name = name.substring(0, name.length-3)
           }
 
-          group.name = name.substring(0, name.length-3)
-        }
-
-        channelTree
-          .children['Group Messages'].children[group.name] = {'id': group.id}
-        channelList[group.id] = {name: group.name, belongsTo: 'Group Messages'}
+          channelTree
+            .children[belongsTo]
+            .children[group.name] = {
+              'name': group.unread_count > 0 ? `${group.name} *` : group.name,
+              'id': group.id
+            }
+          channelList[group.id] = {name: group.name, belongsTo: belongsTo}
+        })
       }
 
       slack.im.list({token}, (err, data) => {
