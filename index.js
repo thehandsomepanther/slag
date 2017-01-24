@@ -56,7 +56,8 @@ function prepareScreen(teamData) {
     label: `#${teamData.channelList[teamData.currentChannel].name}`,
     tags: true,
     scrollable: true,
-    teamData: teamData
+    teamData: teamData,
+    mouse: true
   })
   log.style.border = border
 
@@ -78,7 +79,9 @@ function prepareScreen(teamData) {
     tags: true,
     template: {
       lines: true
-    }
+    },
+    mouse: true,
+    interactive: true
   })
   tree.style.border = border
 
@@ -91,7 +94,9 @@ function prepareScreen(teamData) {
       log.logLines = []
       log.clearItems()
       logHistory(teamData, log)
-      markRead(teamData.token, node.id, timestamp.now())
+      markRead(teamData, node.id, timestamp.now())
+      tree.setData(teamData.channelTree)
+      screen.render()
     }
   })
 
@@ -102,7 +107,9 @@ function prepareScreen(teamData) {
     tags: true,
     template: {
       lines: true
-    }
+    },
+    mouse: true,
+    interactive: true
   })
   teamDisplay.setData({
     extended: true,
@@ -118,6 +125,7 @@ function prepareScreen(teamData) {
   bot.message((message) => {
     if (parseFloat(message.ts) > now) {
       handleMessage(teamData, message, log)
+      tree.setData(teamData.channelTree)
     }
   })
 
@@ -136,15 +144,18 @@ function prepareScreen(teamData) {
   })
 
   screen.on('resize', () => {
-    initScreen(teamData, log)
+    initScreen(teamData, log, tree)
   })
 
-  initScreen(teamData, log)
+  initScreen(teamData, log, tree)
 }
 
-function initScreen(teamData, log) {
+function initScreen(teamData, log, tree) {
   log.clearItems()
   logHistory(teamData, log)
+  markRead(teamData, teamData.currentChannel, timestamp.now())
+  tree.setData(teamData.channelTree)
+  screen.render()
 }
 
 function makeTeamDisplayChildren(tokenList) {
@@ -161,7 +172,8 @@ function run() {
   bot.listen({token})
 
   screen = blessed.screen({
-    fullUnicode: true
+    fullUnicode: true,
+    scrollable: true
   })
   assignScreenEvents()
 
