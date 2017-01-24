@@ -1,19 +1,21 @@
-#!/usr/bin/env node
+#! /usr/bin/env node
 let init = require('../index')
 let yargs = require('yargs')
-let fs = require('fs')
+let fs = require('fs-extra')
 let path = require('path')
 
 let ARGS = yargs.argv
 
 if (ARGS.h || ARGS.help) {
-  console.log("help")
+  console.log(
+    'slag                   \t\tlaunch the slag client\n'+
+    'slag --set-token <path>\t\tset a tokens.json file')
   process.exit(0)
 }
 
 if (ARGS['set-token']) {
-  process.env['SLAG_TOKEN'] = path.join(process.cwd(), ARGS['set-token'])
-  console.log(`Slack tokens set to ${path.join(process.cwd(), ARGS['set-token'])}`)
+  fs.copySync(path.join(process.cwd(), ARGS['set-token']), './tokens.json')
+  console.log('tokens.json created successfully')
   process.exit(0)
 }
 

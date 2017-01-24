@@ -7,14 +7,14 @@
     "slag": "bin/slag.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./bin/init.sh"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "blessed": "^0.1.81",
     "blessed-contrib": "4.7.5",
+    "fs-extra": "^2.0.0",
     "lodash": "^4.17.3",
     "node-notifier": "^4.6.1",
     "path": "0.12.7",
