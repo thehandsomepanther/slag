@@ -9,14 +9,16 @@ let ARGS = yargs.argv
 if (ARGS.h || ARGS.help) {
   console.log(
     'slag                   \t\tlaunch the slag client\n'+
-    'slag --set-token <path>\t\tset a tokens.json file')
+    'slag --set-tokens <path>\t\tset a tokens.json file')
   process.exit(0)
 }
 
-if (ARGS['set-token']) {
-  fs.copySync(path.join(process.cwd(), ARGS['set-token']), './tokens.json')
-  console.log('tokens.json created successfully')
-  process.exit(0)
+if (ARGS['set-tokens']) {
+  let tokenpath = ARGS['set-tokens']
+  if (!path.isAbsolute(tokenpath)) {
+    tokenpath = path.join(process.cwd(), ARGS['set-tokens'])
+  }
+  process.env['SLAG_TOKENS'] = tokenpath
 }
 
 process.on('uncaughtException', function (err) {

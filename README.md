@@ -18,8 +18,9 @@ npm install -g slag-cli
 ```
 then type
 ```
-slag
+slag set-tokens <path-to-your-tokens-json>
 ```
+after doing that, you'll be able to launch slag from just typing `slag` in your command line
 
 you'll also need a `tokens.json` file in the root directory of this project containing all your slack tokens (you can get yours [here](https://api.slack.com/docs/oauth-test-tokens)), like so:
 ```
