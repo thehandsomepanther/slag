@@ -4,7 +4,7 @@ let errors = require('../errors')
 
 module.exports = function getTokens() {
   try {
-    const tokens = fs.readFileSync(path.join(__dirname, '../tokens.json'), { encoding: 'utf-8' })
+    const tokens = fs.readFileSync(process.env['SLAG_TOKEN'], { encoding: 'utf-8' })
     return JSON.parse(tokens)
 
   } catch(exception) {

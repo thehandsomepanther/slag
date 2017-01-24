@@ -12,8 +12,8 @@ if (ARGS.h || ARGS.help) {
 }
 
 if (ARGS['set-token']) {
-  console.log(path.join(__dirname, ARGS['set-token']))
-  // process.env['SLAG_TOKEN'] = path.join(__dirname, ARGS['set-token'])
+  process.env['SLAG_TOKEN'] = path.join(process.cwd(), ARGS['set-token'])
+  console.log(`Slack tokens set to ${path.join(process.cwd(), ARGS['set-token'])}`)
   process.exit(0)
 }
 
