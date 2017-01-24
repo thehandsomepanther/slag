@@ -1,8 +1,12 @@
 {
   "name": "slag-cli",
   "version": "1.0.3",
-  "description": "",
+  "description": "slack in your terminal",
   "main": "index.js",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/thehandsomepanther/slag.git"
+  },
   "bin": {
     "slag": "bin/slag.js"
   },
