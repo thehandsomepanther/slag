@@ -1,5 +1,5 @@
 # slack terminal client
-this is way to send and receive messages to your slack teams in the terminal. i started this project because i used to do all my work on a late 2008 macbook and being in five active slack teams at once meant using the slack desktop or web app was a no go. even on a computer that can handle slack, though, it's sometimes nice to be able to talk to people from the terminal.
+use slack in your terminal with an ncurses-style text-based gui.
 
 ## what this client supports right now
 - chatting (public channels, private channels, DMs, etc)
@@ -12,9 +12,12 @@ this is way to send and receive messages to your slack teams in the terminal. i 
 - files and links (they get printed out, but if they're too long they can go off the screen)
 
 ## how to run:
-clone this repo, then from inside the project directory run
+if you want to be able to run it from anywhere, make sure you have npm installed and run
 ```
-npm install
+npm install -g slag-cli
+```
+then type
+```
 slag
 ```
 
@@ -34,6 +37,14 @@ you'll also need a `tokens.json` file in the root directory of this project cont
 ```
 
 
+## how to contribute
+clone this repo, then from inside the project directory run
+```
+npm install
+```
+and have at it. do the tokens thing too though.
+
+## how to use
 |Key  |Action|
 |---	|---	|
 |Tab  |Switch between channel tree and message input|

@@ -6,7 +6,7 @@ let timestamp = require('unix-timestamp')
 let _ = require('lodash')
 let fs = require('fs')
 let path = require('path')
-let {border, focusBorder} = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), { encoding: 'utf-8' }))
+let {border, focusBorder} = JSON.parse(fs.readFileSync(path.join(process.env['SLAG_TOKEN']), { encoding: 'utf-8' }))
 
 let {
   getTokens,
