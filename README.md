@@ -1,5 +1,7 @@
 # slack terminal client
 use slack in your terminal with an ncurses-style text-based gui.
+![markdown-preview](assets/slag.png)
+
 
 ## what this client supports right now
 - chatting (public channels, private channels, DMs, etc)
