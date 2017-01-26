@@ -49,10 +49,6 @@ module.exports = function getChannels(token, userList, cb) {
 
         channelTree
           .children[belongsTo]
-<<<<<<< HEAD
-          .children[channel.unread_count > 0 ? `${channel.name} *` : channel.name] = { id: channel.id, unread_count: channel.unread_count, last_read: channel.last_read }
-        
-=======
           .children[channel.name] =
             {
               'name': channel.unread_count > 0 ? `${channel.name} *` : channel.name,
@@ -60,7 +56,6 @@ module.exports = function getChannels(token, userList, cb) {
               'unread_count': channel.unread_count
             }
 
->>>>>>> d43ae31741a75dd6c9cfbf8265c19c16fff99590
         channelList[channel.id] = {name: channel.name, belongsTo: belongsTo}
 
         if (channel.is_general) {
@@ -86,11 +81,6 @@ module.exports = function getChannels(token, userList, cb) {
             group.name = name.substring(0, name.length-3)
           }
 
-<<<<<<< HEAD
-        channelTree
-          .children['Group Messages'].children[group.name] = {id: group.id}
-        channelList[group.id] = {name: group.name, belongsTo: 'Group Messages'}
-=======
           channelTree
             .children[belongsTo]
             .children[group.name] = {
@@ -99,7 +89,6 @@ module.exports = function getChannels(token, userList, cb) {
             }
           channelList[group.id] = {name: group.name, belongsTo: belongsTo}
         })
->>>>>>> d43ae31741a75dd6c9cfbf8265c19c16fff99590
       }
 
       slack.im.list({token}, (err, data) => {

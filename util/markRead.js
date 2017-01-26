@@ -1,14 +1,10 @@
 let slack = require('slack')
 let errors = require('../errors')
 
-<<<<<<< HEAD
-module.exports = function markRead(token, channelId, timestamp, cb) {
-  var token = token
-=======
+
 module.exports = function markRead(teamData, channelId, timestamp) {
   var token = teamData.token
   let api = ''
->>>>>>> d43ae31741a75dd6c9cfbf8265c19c16fff99590
 
   switch(channelId[0]) {
     case 'C':
@@ -24,9 +20,6 @@ module.exports = function markRead(teamData, channelId, timestamp) {
       break
   }
 
-<<<<<<< HEAD
-  cb()
-=======
   if (api != '') {
     slack[api].mark({
       token: token,
@@ -51,5 +44,4 @@ function markChannelTreeRead(channelTree, channelList, id) {
       break
     }
   }
->>>>>>> d43ae31741a75dd6c9cfbf8265c19c16fff99590
 }

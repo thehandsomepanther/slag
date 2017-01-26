@@ -1,0 +1,44 @@
+
+###############################################################
+             SLAG TERMINAL CLIENT DOCUMENTATION
+###############################################################
+
+How to run: 
+  
+  You'll need a json file containing all your slack tokens (you can get yours here), like so:
+
+  ```
+  [
+      {
+          "team": "ATEAM",
+          "token": "xoxp-***"
+      },
+      {
+          "team": "ANOTHER_TEAM",
+          "token": "xoxp-***"
+      }
+  ]
+
+  ```
+
+  name your json file whatever you like, then type
+
+  `slag set-tokens <path-to-your-tokens-json>`
+
+  after doing that, you'll be able to launch slag in the future by just typing slag in your command line
+
+
+How to use:
+
+  `Tab` - Switch between channel tree and message input
+  `Ctrl+T` - Cycle through teams
+  `Ctrl+C` - Quit
+  `Esc` - Quit
+
+
+Other commands: 
+
+  `slag --help` for a quick list of possible commands
+
+
+###############################################################

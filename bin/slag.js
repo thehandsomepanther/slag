@@ -1,19 +1,10 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 let init = require('../index')
 let yargs = require('yargs')
 let fs = require('fs-extra')
 let path = require('path')
 
-const bannerPath = path.join(__dirname, '../assets/banner.txt')
-
-try {
-  const banner = fs.readFileSync(bannerPath, { encoding: 'utf-8' })
-  console.log(banner)
-} catch(err) {
-  if (err.code == 'ENOENT') 
-    console.log('Welcome to Slag Client')
-}
-
+const manPath = path.join(__dirname, '../assets/man.txt')
 
 let ARGS = yargs.argv
 
@@ -30,6 +21,10 @@ if (ARGS['set-tokens']) {
     tokenpath = path.join(process.cwd(), ARGS['set-tokens'])
   }
   process.env['SLAG_TOKENS'] = tokenpath
+}
+
+if (ARGS['man']) {
+  console.log(fs.readFileSync(manPath, { encoding: 'utf-8' }))
 }
 
 process.on('uncaughtException', function (err) {
