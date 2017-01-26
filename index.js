@@ -39,6 +39,8 @@ function assignScreenEvents() {
   }
 
   screen.key(['escape', 'C-c'], (ch, key) => {
+    bot.close()
+    screen.destroy()
     return process.exit(0)
   })
 }
@@ -54,7 +56,8 @@ function prepareScreen(teamData) {
     label: `#${teamData.channelList[teamData.currentChannel].name}`,
     tags: true,
     scrollable: true,
-    teamData: teamData
+    teamData: teamData,
+    mouse: true
   })
   log.style.border = border
 
@@ -71,12 +74,14 @@ function prepareScreen(teamData) {
     sendMessage(teamData, message)
   })
 
-  let tree = grid.set(0, 0, 9, 4, contrib.tree, {
+  let tree = grid.set(0, 0, 8.5, 4, contrib.tree, {
     label: `${teamData.currentTeam}`,
     tags: true,
     template: {
       lines: true
-    }
+    },
+    mouse: true,
+    interactive: true
   })
   tree.style.border = border
 
@@ -89,20 +94,23 @@ function prepareScreen(teamData) {
       log.logLines = []
       log.clearItems()
       logHistory(teamData, log)
-      markRead(teamData.token, node.id, timestamp.now(), () => {
-        setData(tree, teamData.channelTree)
-      })
+      
+      markRead(teamData, node.id, timestamp.now())
+      tree.setData(teamData.channelTree)
+      screen.render()
     }
   })
 
   setData(tree, teamData.channelTree)
 
-  let teamDisplay = grid.set(9, 0, 3, 4, contrib.tree, {
+  let teamDisplay = grid.set(8.5, 0, 4, 4, contrib.tree, {
     label: `Your Teams`,
     tags: true,
     template: {
       lines: true
-    }
+    },
+    mouse: true,
+    interactive: true
   })
   teamDisplay.setData({
     extended: true,
@@ -118,6 +126,7 @@ function prepareScreen(teamData) {
   bot.message((message) => {
     if (parseFloat(message.ts) > now) {
       handleMessage(teamData, message, log)
+      tree.setData(teamData.channelTree)
     }
   })
 
@@ -136,15 +145,18 @@ function prepareScreen(teamData) {
   })
 
   screen.on('resize', () => {
-    initScreen(teamData, log)
+    initScreen(teamData, log, tree)
   })
 
-  initScreen(teamData, log)
+  initScreen(teamData, log, tree)
 }
 
-function initScreen(teamData, log) {
+function initScreen(teamData, log, tree) {
   log.clearItems()
   logHistory(teamData, log)
+  markRead(teamData, teamData.currentChannel, timestamp.now())
+  tree.setData(teamData.channelTree)
+  screen.render()
 }
 
 function makeTeamDisplayChildren(tokenList) {
@@ -165,7 +177,8 @@ function run() {
   bot.listen({token})
 
   screen = blessed.screen({
-    fullUnicode: true
+    fullUnicode: true,
+    scrollable: true
   })
   assignScreenEvents()
 

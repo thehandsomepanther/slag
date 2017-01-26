@@ -1,4 +1,36 @@
+#! /usr/bin/env node
 let init = require('../index')
+let yargs = require('yargs')
+let fs = require('fs-extra')
+let path = require('path')
+
+const bannerPath = path.join(__dirname, '../assets/banner.txt')
+
+try {
+  const banner = fs.readFileSync(bannerPath, { encoding: 'utf-8' })
+  console.log(banner)
+} catch(err) {
+  if (err.code == 'ENOENT') 
+    console.log('Welcome to Slag Client')
+}
+
+
+let ARGS = yargs.argv
+
+if (ARGS.h || ARGS.help) {
+  console.log(
+    'slag                   \t\tlaunch the slag client\n'+
+    'slag --set-tokens <path>\t\tset a tokens.json file')
+  process.exit(0)
+}
+
+if (ARGS['set-tokens']) {
+  let tokenpath = ARGS['set-tokens']
+  if (!path.isAbsolute(tokenpath)) {
+    tokenpath = path.join(process.cwd(), ARGS['set-tokens'])
+  }
+  process.env['SLAG_TOKENS'] = tokenpath
+}
 
 process.on('uncaughtException', function (err) {
   console.error(`[${(new Date).toUTCString()}] ${err.name}: ${err.message}\n`)

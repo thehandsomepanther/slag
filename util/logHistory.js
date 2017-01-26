@@ -39,7 +39,8 @@ function getHistory(token, channel, gen) {
 
   slack[api].history({
     token: token,
-    channel: channel
+    channel: channel,
+    count: 50
   }, (err, data) => {
     if (err) {
       gen.next("Oops! We weren't able to get messages right now. Try again later.")

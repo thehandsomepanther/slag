@@ -14,12 +14,12 @@ if [[ $(node --version | grep ${VERSIONS}) ]] ; then
   node ./bin/slag.js
 else
   echo "${RED}It appears that you don't have the appropriate node version to run this program${GRN}"
-  read -p "Would you like to install it? (Y/N): " res 
+  read -p "Would you like to install it? (Y/N): " res
   case "${res}" in [yY]|[yY][eE][sS])
     echo "${NC}Installing prerequisites..."
     if [[ ! $(npm list -g n) ]] ; then
       npm i -g n
     fi
     n $VALID_NODE_VERSION
-  esac 
+  esac
 fi
