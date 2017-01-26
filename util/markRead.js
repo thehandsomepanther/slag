@@ -1,6 +1,7 @@
 let slack = require('slack')
 let errors = require('../errors')
 
+
 module.exports = function markRead(teamData, channelId, timestamp) {
   var token = teamData.token
   let api = ''

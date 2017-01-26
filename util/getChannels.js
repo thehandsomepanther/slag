@@ -95,7 +95,7 @@ module.exports = function getChannels(token, userList, cb) {
         var ims = data.ims
         for (let im of ims) {
           channelTree
-            .children['Direct Messages'].children[userList[im.user]] = {'id': im.id}
+            .children['Direct Messages'].children[userList[im.user]] = {id: im.id}
           channelList[im.id] = {name: userList[im.user], belongsTo: 'Direct Messages'}
         }
 

@@ -94,13 +94,14 @@ function prepareScreen(teamData) {
       log.logLines = []
       log.clearItems()
       logHistory(teamData, log)
+      
       markRead(teamData, node.id, timestamp.now())
       tree.setData(teamData.channelTree)
       screen.render()
     }
   })
 
-  tree.setData(teamData.channelTree)
+  setData(tree, teamData.channelTree)
 
   let teamDisplay = grid.set(8.5, 0, 4, 4, contrib.tree, {
     label: `Your Teams`,
@@ -167,6 +168,10 @@ function makeTeamDisplayChildren(tokenList) {
   return children
 }
 
+function setData(tree, channelTree) {
+  tree.setData(channelTree)
+}
+
 function run() {
   token = tokenList[t % tokenList.length].token
   bot.listen({token})
@@ -194,5 +199,16 @@ function init() {
 
   run()
 }
+
+function sortObjectKeysBy (obj, comparator) {
+  let keys = _.sortBy(_.keys(obj), (key) => {
+      return comparator ? comparator(obj[key], key) : key
+  })
+
+  return _.zipObject(keys, _.map(keys, (key) => {
+      return obj[key]
+  }))
+}
+
 
 module.exports = init
