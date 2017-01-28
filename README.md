@@ -52,7 +52,7 @@ slag
 ## how to use
 |Key  |Action|
 |---	|---	|
-|Tab  |Switch between channel tree and message input|
+|Tab  |Switch between channel selection, message box, and team selection|
 |Ctrl+T|Cycle through teams|
 |Ctrl+C|Quit|
 |Esc  |Quit|
