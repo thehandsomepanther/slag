@@ -1,6 +1,6 @@
 {
   "name": "slag-cli",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "slack in your terminal",
   "main": "index.js",
   "repository": {
@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall" : "node bin/postinstall.js"
+    "postinstall": "node bin/postinstall.js"
   },
   "author": "",
   "license": "ISC",
