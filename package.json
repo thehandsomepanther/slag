@@ -1,6 +1,6 @@
 {
   "name": "slag-cli",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "slack in your terminal",
   "main": "index.js",
   "repository": {
