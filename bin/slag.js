@@ -10,11 +10,12 @@ let ARGS = yargs.argv
 
 if (ARGS.h || ARGS.help) {
   console.log(
-    'slag                    \tlaunch the slag client\n'+
-    'slag --h                \tbring up slag commands\n'+
-    'slag --man              \tlearn how to use slag\n'+
-    'slag --set-tokens <path>\tset a tokens.json file\n' +
-    'slag --add-token <token>\tadd a token to your tokens.json')
+    'slag                                   \tlaunch the slag client\n'+
+    'slag --h                               \tbring up slag commands\n'+
+    'slag --man                             \tlearn how to use slag\n'+
+    'slag --set-tokens <path>               \tset a tokens.json file\n' +
+    'slag --add-token <token> --team <team> \tadd a token to your tokens.json\n' +
+    'slag --list-tokens                     \tprint a list of registered tokens')
   process.exit(0)
 }
 
