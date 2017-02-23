@@ -7,6 +7,8 @@ module.exports = function getTokens() {
 
   if (process.env['SLAG_TOKENS_PATH']) {
     fs.copySync(process.env['SLAG_TOKENS_PATH'], TOKENSPATH)
+    console.log("Slack tokens file set! Now type `slag` to launch the client.")
+    process.exit(0)
   }
 
   let tokens = []
