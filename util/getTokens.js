@@ -16,7 +16,7 @@ module.exports = function getTokens() {
     tokens = JSON.parse(fs.readFileSync(TOKENSPATH))
   } catch(e) {
     if (!process.env['SLAG_TOKEN']) {
-      if (exception.code === 'ENOENT') {
+      if (e.code === 'ENOENT') {
         console.log('Tokens.json file missing!\n', new errors.ConfigurationError('Use `slag --help` to learn how to set a tokens file.', null))
       } else {
         console.log('Tokens.json file incorrect!\n', new errors.ConfigurationError('There\'s something wrong with your tokens.json configuration file\nMake sure it\'s in the format specified here: https://github.com/thehandsomepanther/slag/blob/master/README.md', null))
