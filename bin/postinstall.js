@@ -13,4 +13,4 @@ try {
     console.log('Welcome to Slag Client')
 }
 
-console.log('Type slag --man to get started\n')
+console.log('Type `slag --man` to get started\n')

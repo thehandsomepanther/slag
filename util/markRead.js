@@ -26,10 +26,7 @@ module.exports = function markRead(teamData, channelId, timestamp) {
       channel: channelId,
       ts: timestamp
     }, (err, data) => {
-      if (err) {
-        throw new errors.ExternalResourceError("Unable to mark direct message as read. Check if you have a valid Slack token")
-        return process.exit(1)
-      }
+
     })
   }
 

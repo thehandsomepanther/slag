@@ -8,6 +8,20 @@ How to run:
   You'll need a json file containing all your slack tokens (you can get yours here), like so:
 
   ```
+=======
+Quickstart:
+  You need tokens for each team you'd like to use in slag. You
+  can generate tokens for your team at the Slack website:
+  https://api.slack.com/docs/oauth-test-tokens
+
+  To register a token with slag, type
+  slag --add-token <your-token> --team <team-name>
+
+  If you'd like to add multiple teams at once, you can simply
+  make your own json file and type
+  slag --set-tokens <path-to-your-tokens-json>
+
+  Your json file should be structured like this:
   [
       {
           "team": "ATEAM",
@@ -38,6 +52,20 @@ How to use:
 
 Other commands: 
 
+=======
+  Once you've registered at least one token, you should be able
+  to run slag from anywhere (assuming you've installed it
+  globally) in your command line by typing:
+  slag
+
+How to use:
+  `Tab`       Switch between channels, message box, and teams
+  `Ctrl+T`    Cycle through teams
+  `Ctrl+C`    Quit
+  `Esc`       Quit
+
+
+Other commands:
   `slag --help` for a quick list of possible commands
 
 

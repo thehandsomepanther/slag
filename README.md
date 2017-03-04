@@ -18,31 +18,41 @@ if you want to be able to run it from anywhere, make sure you have npm installed
 ```
 npm install -g slag-cli
 ```
+you'll need tokens for each team you'd like to use in slag. You can generate tokens for your team [here](https://api.slack.com/docs/oauth-test-tokens)
 
-you'll need a json file containing all your slack tokens (you can get yours [here](https://api.slack.com/docs/oauth-test-tokens)), like so:
+to register a token with slag, type
+```
+slag --add-token <your-token> --team <team-name>
+```
+
+if you'd like to add multiple teams at once, you can simply make your own json file and type
+```
+slag --set-tokens <path-to-your-tokens-json>
+```
+
+if you choose to set your json manually, it should be structured like this:
 ```
 [
-	{
-		"team": "ATEAM",
-		"token": "xoxp-***"
-	},
-	{
-		"team": "ANOTHER_TEAM",
-		"token": "xoxp-***"
-	}
+		{
+				"team": "ATEAM",
+				"token": "xoxp-***"
+		},
+		{
+				"team": "ANOTHER_TEAM",
+				"token": "xoxp-***"
+		}
 ]
 ```
 
-name your json file whatever you like, then type
+once you've registered at least one token, you should be able to run slag from anywhere (assuming you've installed it globally) in your command line by typing:
 ```
-slag set-tokens <path-to-your-tokens-json>
+slag
 ```
-after doing that, you'll be able to launch slag in the future by just typing `slag` in your command line
 
 ## how to use
 |Key  |Action|
 |---	|---	|
-|Tab  |Switch between channel tree and message input|
+|Tab  |Switch between channel selection, message box, and team selection|
 |Ctrl+T|Cycle through teams|
 |Ctrl+C|Quit|
 |Esc  |Quit|
