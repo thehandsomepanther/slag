@@ -33,14 +33,14 @@ slag --set-tokens <path-to-your-tokens-json>
 if you choose to set your json manually, it should be structured like this:
 ```
 [
-		{
-				"team": "ATEAM",
-				"token": "xoxp-***"
-		},
-		{
-				"team": "ANOTHER_TEAM",
-				"token": "xoxp-***"
-		}
+  {
+    "team": "ATEAM",
+    "token": "xoxp-***"
+  },
+  {
+    "team": "ANOTHER_TEAM",
+    "token": "xoxp-***"
+  }
 ]
 ```
 
