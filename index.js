@@ -57,12 +57,14 @@ function prepareScreen(teamData) {
     tags: true,
     scrollable: true,
     teamData: teamData,
+    vi: true,
     mouse: true
   })
   log.style.border = border
 
   let input = grid.set(11, 4, 1.5, 8, blessed.textbox, {
     keys: true,
+    vi: true,
     label: `Message #${teamData.channelList[teamData.currentChannel].name}`,
   })
   input.style.border = border
@@ -81,6 +83,7 @@ function prepareScreen(teamData) {
       lines: true
     },
     mouse: true,
+    vi: true,
     interactive: true
   })
   tree.style.border = border
@@ -110,6 +113,7 @@ function prepareScreen(teamData) {
       lines: true
     },
     mouse: true,
+    vi: true,
     interactive: true
   })
   teamDisplay.setData({
@@ -178,6 +182,7 @@ function run() {
 
   screen = blessed.screen({
     fullUnicode: true,
+    vi: true,
     scrollable: true
   })
   assignScreenEvents()
